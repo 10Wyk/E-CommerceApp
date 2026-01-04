@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "E-CommerceApp"
 include(":app")
- 
+include(":shared")
