@@ -1,19 +1,8 @@
-package com.wyk.e_commerceapp.ui.theme
+package com.e_commerce.shared
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import com.e_commerce.shared.AppColor
-import com.e_commerce.shared.Black
-import com.e_commerce.shared.Gray
-import com.e_commerce.shared.GrayDarker
-import com.e_commerce.shared.GrayLighter
-import com.e_commerce.shared.LocalAppColor
-import com.e_commerce.shared.Orange
-import com.e_commerce.shared.Red
-import com.e_commerce.shared.White
-import com.e_commerce.shared.Yellowish
 
 private val lightColors = AppColor(
     surface = White,
@@ -38,8 +27,8 @@ private val lightColors = AppColor(
 )
 
 @Composable
-fun ECommerceAppTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+fun PreviewTheme(
+    darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val appColor = when {
@@ -47,14 +36,11 @@ fun ECommerceAppTheme(
         else -> lightColors
     }
 
-    MaterialTheme(
-        typography = Typography,
-        content = {
-            CompositionLocalProvider(
-                LocalAppColor provides appColor
-            ) {
-                content.invoke()
-            }
+    CompositionLocalProvider(
+        LocalAppColor provides appColor
+    ) {
+        Surface {
+            content.invoke()
         }
-    )
+    }
 }

@@ -1,5 +1,6 @@
 package com.e_commerce.shared
 
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 val GrayLighter = Color(0xFFFAFAFA)
@@ -18,26 +19,30 @@ val CategoryGreen = Color(0xFF19D109)
 val CategoryPurple = Color(0xFF8E5EFF)
 val CategoryRed = Color(0xFFFF5E60)
 
-val Surface = White
-val SurfaceLighter = GrayLighter
-val SurfaceDarker = Gray
-val SurfaceBrand = Yellowish
-val SurfaceError = Red
-val SurfaceSecondary = Orange
+data class AppColor(
+    val surface: Color,
+    val surfaceLighter: Color,
+    val surfaceDarker: Color,
+    val surfaceBrand: Color,
+    val surfaceError: Color,
+    val surfaceSecondary: Color,
 
-val BorderIdle = GrayDarker
-val BorderError = Red
-val BorderSecondary = Orange
+    val borderIdle: Color,
+    val borderError: Color,
+    val borderSecondary: Color,
 
-val TextPrimary = Black
-val TextSecondary = Orange
-val TextWhite = White
-val TextBrand = Yellowish
+    val textPrimary: Color,
+    val textSecondary: Color,
+    val textWhite: Color,
+    val textBrand: Color,
 
-val ButtonPrimary = Yellowish
-val ButtonSecondary = GrayDarker
-val ButtonDisabled = GrayDarker
+    val buttonPrimary: Color,
+    val buttonSecondary: Color,
+    val buttonDisabled: Color,
 
-val IconPrimary = Black
-val IconSecondary = Orange
-val IconWhite = White
+    val iconPrimary: Color,
+    val iconSecondary: Color,
+    val uconWhite: Color
+)
+
+val LocalAppColor = compositionLocalOf<AppColor> { error("App color is not provided") }

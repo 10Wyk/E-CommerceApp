@@ -1,5 +1,7 @@
 package com.e_commerce.shared
 
+import androidx.compose.runtime.Composable
+
 object Resources {
     object Icon {
         val Plus = R.drawable.plus
@@ -40,4 +42,8 @@ object Resources {
         val Usa = R.drawable.usa
         val Serbia = R.drawable.serbia
     }
+
+    val appColors: AppColor
+        @Composable
+        get() = LocalAppColor.current
 }

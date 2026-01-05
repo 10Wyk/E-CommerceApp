@@ -45,4 +45,6 @@ dependencies {
     implementation(libs.kotlinx.serialization)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okHttp)
+    implementation(platform(libs.koin.bom))
+    implementation(libs.bundles.koin)
 }

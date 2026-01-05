@@ -18,6 +18,8 @@ messagebar = "1.0.9"
 splashscreen = "1.2.0"
 appcompat = "1.7.1"
 material = "1.10.0"
+appcompatVersion = "1.7.1"
+materialVersion = "1.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -50,6 +52,8 @@ datastore-preferences = { module = "androidx.datastore:datastore-preferences", v
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 messagebar = { module = "com.stevdza-san:messagebarkmp", version.ref = "messagebar" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompatVersion" }
+material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

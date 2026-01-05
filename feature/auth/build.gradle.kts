@@ -1,33 +1,19 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlinx.serialization.plugin)
 }
 
 android {
-    namespace = "com.wyk.e_commerceapp"
+    namespace = "com.e_commerce.auth"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.wyk.e_commerceapp"
         minSdk = 26
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -65,10 +51,6 @@ dependencies {
     implementation(libs.bundles.koin)
     implementation(libs.datastore)
     implementation(libs.datastore.preferences)
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okHttp)
     implementation(libs.messagebar)
-    implementation(libs.core.splashscreen)
     implementation(project(":shared"))
-    implementation(project(":feature:auth"))
 }
