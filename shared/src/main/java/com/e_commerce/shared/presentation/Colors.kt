@@ -1,4 +1,4 @@
-package com.e_commerce.shared
+package com.e_commerce.shared.presentation
 
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlinx.serialization.plugin)
 }
 
 android {
@@ -52,5 +53,8 @@ dependencies {
     implementation(libs.datastore)
     implementation(libs.datastore.preferences)
     implementation(libs.messagebar)
+    implementation(libs.bundles.firebase)
+    implementation(libs.auth.kmp)
+    implementation(libs.auth.firebase.kmp)
     implementation(project(":shared"))
 }

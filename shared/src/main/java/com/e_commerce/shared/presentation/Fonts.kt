@@ -1,4 +1,4 @@
-package com.e_commerce.shared
+package com.e_commerce.shared.presentation
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
@@ -6,6 +6,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.e_commerce.shared.R
 
 @SuppressLint("ComposableNaming")
 @Composable

@@ -1,4 +1,4 @@
-package com.e_commerce.shared
+package com.e_commerce.shared.presentation
 
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable

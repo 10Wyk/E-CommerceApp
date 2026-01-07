@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.e_commerce.auth.Auth
+import com.e_commerce.navigation.AppNavController
 import com.wyk.e_commerceapp.ui.theme.ECommerceAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ECommerceAppTheme {
-                Auth()
+                AppNavController()
             }
         }
     }

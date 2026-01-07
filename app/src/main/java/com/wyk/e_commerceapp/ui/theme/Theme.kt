@@ -4,16 +4,16 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import com.e_commerce.shared.AppColor
-import com.e_commerce.shared.Black
-import com.e_commerce.shared.Gray
-import com.e_commerce.shared.GrayDarker
-import com.e_commerce.shared.GrayLighter
-import com.e_commerce.shared.LocalAppColor
-import com.e_commerce.shared.Orange
-import com.e_commerce.shared.Red
-import com.e_commerce.shared.White
-import com.e_commerce.shared.Yellowish
+import com.e_commerce.shared.presentation.AppColor
+import com.e_commerce.shared.presentation.Black
+import com.e_commerce.shared.presentation.Gray
+import com.e_commerce.shared.presentation.GrayDarker
+import com.e_commerce.shared.presentation.GrayLighter
+import com.e_commerce.shared.presentation.LocalAppColor
+import com.e_commerce.shared.presentation.Orange
+import com.e_commerce.shared.presentation.Red
+import com.e_commerce.shared.presentation.White
+import com.e_commerce.shared.presentation.Yellowish
 
 private val lightColors = AppColor(
     surface = White,

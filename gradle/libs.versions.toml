@@ -16,10 +16,10 @@ coil3 = "3.3.0"
 datastore = "1.2.0"
 messagebar = "1.0.9"
 splashscreen = "1.2.0"
-appcompat = "1.7.1"
-material = "1.10.0"
-appcompatVersion = "1.7.1"
-materialVersion = "1.10.0"
+googleService = "4.4.4"
+firebase = "2.4.0"
+auth = "2.3.1"
+notifier = "1.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +37,7 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
+
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
@@ -45,6 +46,7 @@ koin-compose = { module = "io.insert-koin:koin-compose" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
 koin-test = { module = "io.insert-koin:koin-test" }
 koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4" }
+
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3" }
 coil-network-okHttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil3" }
@@ -52,8 +54,15 @@ datastore-preferences = { module = "androidx.datastore:datastore-preferences", v
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 messagebar = { module = "com.stevdza-san:messagebarkmp", version.ref = "messagebar" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompatVersion" }
-material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
+
+firebase-app = { module = "dev.gitlive:firebase-app", version.ref = "firebase" }
+firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebase" }
+firebase-storage = { module = "dev.gitlive:firebase-storage", version.ref = "firebase" }
+firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebase" }
+
+auth-kmp = { module = "io.github.mirzemehdi:kmpauth-google", version.ref = "auth" }
+auth-firebase-kmp = { module = "io.github.mirzemehdi:kmpauth-firebase", version.ref = "auth" }
+kmp-notifier = { module = "io.github.mirzemehdi:kmpnotifier", version.ref = "notifier" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -61,6 +70,8 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinx-serialization-plugin = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serializationPlugin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleService" }
 
 [bundles]
 koin = ["koin-core", "koin-compose", "koin-android", "koin-androidx-compose", "koin-compose-viewmodel", "koin-test", "koin-test-junit4"]
+firebase = ["firebase-app", "firebase-firestore", "firebase-storage", "firebase-common"]

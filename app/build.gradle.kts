@@ -1,8 +1,12 @@
+import com.wyk.buildsrc.escaped
+import com.wyk.buildsrc.getProperty
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlinx.serialization.plugin)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -17,6 +21,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "WEB_CLIENT_ID", getProperty("server.client.id").escaped())
     }
 
     buildTypes {
@@ -39,6 +45,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -69,6 +76,9 @@ dependencies {
     implementation(libs.coil.network.okHttp)
     implementation(libs.messagebar)
     implementation(libs.core.splashscreen)
+    implementation(libs.firebase.app)
+    implementation(libs.auth.kmp)
+    implementation(libs.auth.firebase.kmp)
     implementation(project(":shared"))
-    implementation(project(":feature:auth"))
+    implementation(project(":navigation"))
 }

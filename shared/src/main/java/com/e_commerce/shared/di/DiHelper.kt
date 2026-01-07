@@ -1,4 +1,4 @@
-package com.e_commerce.shared
+package com.e_commerce.shared.di
 
 import org.koin.core.Koin
 import org.koin.core.qualifier.Qualifier

@@ -1,6 +1,7 @@
-package com.e_commerce.shared
+package com.e_commerce.shared.presentation
 
 import androidx.compose.runtime.Composable
+import com.e_commerce.shared.R
 
 object Resources {
     object Icon {

@@ -27,10 +27,10 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.e_commerce.shared.FontSize
-import com.e_commerce.shared.PreviewTheme
-import com.e_commerce.shared.Resources
-import com.e_commerce.shared.RobotoCondensedMediumFont
+import com.e_commerce.shared.presentation.FontSize
+import com.e_commerce.shared.presentation.PreviewTheme
+import com.e_commerce.shared.presentation.Resources
+import com.e_commerce.shared.presentation.RobotoCondensedMediumFont
 
 @Composable
 fun GoogleSignUpButton(
@@ -70,11 +70,11 @@ fun GoogleSignUpButton(
             horizontalArrangement = Arrangement.Center
         ) {
             if (!loading) Image(
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(24.dp),
                 painter = painterResource(icon),
                 contentDescription = null
             ) else CircularProgressIndicator(
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(24.dp),
                 color = progressIndicatorColor,
                 trackColor = Color.Transparent,
                 strokeCap = StrokeCap.Round

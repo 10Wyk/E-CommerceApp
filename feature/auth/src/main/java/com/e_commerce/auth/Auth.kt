@@ -11,32 +11,40 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import com.e_commerce.auth.component.GoogleSignUpButton
-import com.e_commerce.shared.BebasNeueRegularFont
-import com.e_commerce.shared.FontSize
-import com.e_commerce.shared.PreviewTheme
-import com.e_commerce.shared.Resources
-import com.e_commerce.shared.RobotoCondensedMediumFont
+import com.e_commerce.shared.presentation.BebasNeueRegularFont
+import com.e_commerce.shared.presentation.FontSize
+import com.e_commerce.shared.presentation.PreviewTheme
+import com.e_commerce.shared.presentation.Resources
+import com.e_commerce.shared.presentation.RobotoCondensedMediumFont
+import com.mmk.kmpauth.google.GoogleButtonUiContainer
+import kotlinx.serialization.Serializable
 import rememberMessageBarState
 
-@Composable
-fun Auth() {
-    viewModel {
-        AuthViewModel()
-    }
+@Serializable
+object AuthScreen
 
-    AuthView()
+fun NavGraphBuilder.auth() {
+    composable<AuthScreen> {
+        AuthView()
+    }
 }
 
 @Composable
 private fun AuthView() {
     val messageBarState = rememberMessageBarState()
+    var loading by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -79,7 +87,25 @@ private fun AuthView() {
                     )
                 }
 
-                GoogleSignUpButton { }
+                GoogleButtonUiContainer(
+                    filterByAuthorizedAccounts = false,
+                    onGoogleSignInResult = { googleUser ->
+                        loading = false
+                        if (googleUser == null)
+                            messageBarState.addError("Unable to login with google account")
+                        else
+                            messageBarState.addSuccess("Authentication success")
+                    }
+                ) {
+                    GoogleSignUpButton(
+                        modifier = Modifier
+                            .padding(bottom = 24.dp),
+                        loading = loading
+                    ) {
+                        loading = true
+                        this.onClick()
+                    }
+                }
             }
         }
     }
