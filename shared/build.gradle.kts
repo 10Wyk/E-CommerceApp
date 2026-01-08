@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlinx.serialization.plugin)
 }
 
 android {
@@ -23,6 +24,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -47,4 +49,6 @@ dependencies {
     implementation(libs.coil.network.okHttp)
     implementation(platform(libs.koin.bom))
     implementation(libs.bundles.koin)
+    implementation(libs.kotlinx.serialization)
+    implementation(libs.auth.kmp)
 }

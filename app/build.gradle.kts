@@ -21,8 +21,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField("String", "WEB_CLIENT_ID", getProperty("server.client.id").escaped())
+        buildConfigField(
+            "String",
+            "WEB_CLIENT_ID",
+            getProperty(rootProject, "server.client.id").escaped()
+        )
     }
 
     buildTypes {
