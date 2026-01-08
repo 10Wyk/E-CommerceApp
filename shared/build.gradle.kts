@@ -50,5 +50,5 @@ dependencies {
     implementation(platform(libs.koin.bom))
     implementation(libs.bundles.koin)
     implementation(libs.kotlinx.serialization)
-    implementation(libs.auth.kmp)
+    implementation(libs.auth.firebase.kmp)
 }

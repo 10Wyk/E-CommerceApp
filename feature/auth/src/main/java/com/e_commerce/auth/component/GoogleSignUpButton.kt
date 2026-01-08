@@ -77,7 +77,8 @@ fun GoogleSignUpButton(
                 modifier = Modifier.size(24.dp),
                 color = progressIndicatorColor,
                 trackColor = Color.Transparent,
-                strokeCap = StrokeCap.Round
+                strokeCap = StrokeCap.Round,
+                strokeWidth = 2.dp
             )
 
             Spacer(modifier = Modifier.width(12.dp))

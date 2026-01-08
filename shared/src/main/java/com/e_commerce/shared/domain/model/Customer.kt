@@ -1,6 +1,6 @@
 package com.e_commerce.shared.domain.model
 
-import com.mmk.kmpauth.google.GoogleUser
+import dev.gitlive.firebase.auth.FirebaseUser
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,12 +18,12 @@ data class Customer(
     val cartItems: List<CartItem> = emptyList()
 )
 
-fun GoogleUser.toCustomer() = Customer(
-    id = idToken,
-    firstName = displayName.split(" ").firstOrNull() ?: "Unknown",
-    lastName = displayName.split(" ").lastOrNull() ?: "Unknown",
+fun FirebaseUser.toCustomer() = Customer(
+    id = uid,
+    firstName = displayName?.split(" ")?.firstOrNull() ?: "Unknown",
+    lastName = displayName?.split(" ")?.lastOrNull() ?: "Unknown",
     email = email,
-    imageUrl = profilePicUrl
+    imageUrl = photoURL
 )
 
 @Serializable

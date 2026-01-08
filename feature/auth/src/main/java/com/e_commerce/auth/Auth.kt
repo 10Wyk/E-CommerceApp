@@ -118,6 +118,7 @@ private fun AuthView(
 
                 GoogleButtonUiContainerFirebase(
                     filterByAuthorizedAccounts = false,
+                    linkAccount = false,
                     onResult = { result ->
                         action(AuthAction.OnSignUpResult(result))
                     }
