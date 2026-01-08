@@ -4,9 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.e_commerce.auth.model.AuthAction
 import com.e_commerce.auth.model.AuthEvent
+import com.e_commerce.shared.R
 import com.e_commerce.shared.di.DiHelper
 import com.e_commerce.shared.domain.model.toCustomer
 import com.e_commerce.shared.domain.repository.CustomerRepository
+import com.e_commerce.shared.domain.resourceManager.ResourceManager
+import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -30,6 +33,7 @@ class AuthViewModel : ViewModel() {
 
     private val diComponent = object {
         val customerRepository = DiHelper.get<CustomerRepository>()
+        val resourceManager = DiHelper.get<ResourceManager>()
     }
 
     fun actionHandler(action: AuthAction) {
@@ -49,27 +53,46 @@ class AuthViewModel : ViewModel() {
 
             result.onSuccess { firebaseUser ->
                 diComponent.customerRepository.createCustomer(
-                    user = firebaseUser?.toCustomer(),
+                    customer = firebaseUser?.toCustomer(),
                     onError = { error ->
                         _eventChannel.trySend(AuthEvent.UpdateErrorMessage(error))
                     },
                     onSuccess = {
-                        _eventChannel.trySend(AuthEvent.UpdateSuccessMessage("Authenticated"))
+                        _eventChannel.trySend(
+                            AuthEvent.UpdateSuccessMessage(
+                                diComponent.resourceManager.readString(
+                                    R.string.msg_authenticated
+                                )
+                            )
+                        )
                     }
                 )
             }.onFailure { throwable ->
+                println(throwable)
+
                 when (throwable) {
                     is UnresolvedAddressException, is UnknownHostException,
-                    is ConnectException, is SSLHandshakeException,
+                    is ConnectException, is SSLHandshakeException, is FirebaseException,
                     is IOException ->
-                        _eventChannel.trySend(AuthEvent.UpdateErrorMessage("Internet connection unavailable."))
+                        _eventChannel.trySend(
+                            AuthEvent.UpdateErrorMessage(
+                                diComponent.resourceManager.readString(R.string.msg_internet_not_available)
+                            )
+                        )
 
                     is IllegalStateException ->
-                        _eventChannel.trySend(AuthEvent.UpdateErrorMessage("Sign in canceled."))
+                        _eventChannel.trySend(
+                            AuthEvent.UpdateErrorMessage(
+                                diComponent.resourceManager.readString(
+                                    R.string.msg_sign_in_canceled
+                                )
+                            )
+                        )
 
                     else -> _eventChannel.trySend(
                         AuthEvent.UpdateErrorMessage(
-                            throwable.message ?: "Unknown"
+                            throwable.message
+                                ?: diComponent.resourceManager.readString(R.string.lbl_unknown)
                         )
                     )
                 }

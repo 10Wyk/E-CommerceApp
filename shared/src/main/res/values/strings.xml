@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string name="lbl_unknown">Unknown</string>
+
+    <string name="msg_authenticated">Authenticated</string>
+    <string name="msg_error_creating_a_customer">Error while creating a Customer: %1$s</string>
+    <string name="msg_internet_not_available">Internet connection unavailable</string>
+    <string name="msg_sign_in_canceled">Sign in canceled</string>
+    <string name="msg_user_not_available">User is not available</string>
+</resources>
