@@ -20,6 +20,8 @@ googleService = "4.4.4"
 firebase = "2.4.0"
 auth = "2.3.1"
 notifier = "1.6.1"
+appcompat = "1.7.1"
+material = "1.13.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -63,6 +65,8 @@ firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "fireb
 auth-kmp = { module = "io.github.mirzemehdi:kmpauth-google", version.ref = "auth" }
 auth-firebase-kmp = { module = "io.github.mirzemehdi:kmpauth-firebase", version.ref = "auth" }
 kmp-notifier = { module = "io.github.mirzemehdi:kmpnotifier", version.ref = "notifier" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

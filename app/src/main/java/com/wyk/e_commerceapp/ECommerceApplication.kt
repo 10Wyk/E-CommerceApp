@@ -18,8 +18,7 @@ class ECommerceApplication : Application() {
             modules(sharedModule)
         }
         DiHelper.init(koinApplication.koin)
-
-        Firebase.initialize(this)
-        GoogleAuthProvider.create(credentials = GoogleAuthCredentials(serverId = "110170296884-alpm2bpagtjtk84l50k2hp5bndcsh15c.apps.googleusercontent.com"))
+        Firebase.initialize(context = this)
+        GoogleAuthProvider.create(credentials = GoogleAuthCredentials(serverId = BuildConfig.WEB_CLIENT_ID))
     }
 }

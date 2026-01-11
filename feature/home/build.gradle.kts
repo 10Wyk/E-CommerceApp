@@ -6,16 +6,19 @@ plugins {
 }
 
 android {
-    namespace = "com.e_commerce.navigation"
+    namespace = "com.e_commerce.home"
     compileSdk = 36
 
     defaultConfig {
         minSdk = 26
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
     kotlin {
         compilerOptions {
             optIn.add("kotlin.RequiresOptIn")
@@ -43,11 +46,15 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation(libs.compose.navigation)
     implementation(libs.kotlinx.serialization)
     implementation(platform(libs.koin.bom))
     implementation(libs.bundles.koin)
-    implementation(libs.compose.navigation)
-    implementation(project(":feature:auth"))
-    implementation(project(":feature:home"))
+    implementation(libs.datastore)
+    implementation(libs.datastore.preferences)
+    implementation(libs.messagebar)
+    implementation(libs.bundles.firebase)
+    implementation(libs.auth.kmp)
+    implementation(libs.auth.firebase.kmp)
     implementation(project(":shared"))
 }

@@ -2,6 +2,7 @@ package com.e_commerce.auth
 
 import ContentWithMessageBar
 import MessageBarState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,13 +33,16 @@ import com.e_commerce.shared.presentation.Resources
 import com.e_commerce.shared.presentation.RobotoCondensedMediumFont
 import com.e_commerce.shared.util.collectAsOneTimeEvent
 import com.mmk.kmpauth.firebase.google.GoogleButtonUiContainerFirebase
+import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import rememberMessageBarState
 
 @Serializable
 object AuthScreen
 
-fun NavGraphBuilder.auth() {
+fun NavGraphBuilder.auth(
+    navigateToHomeScreen: () -> Unit
+) {
     composable<AuthScreen> {
         val viewModel = viewModel { AuthViewModel() }
         val loadingState = viewModel.state.collectAsStateWithLifecycle().value
@@ -57,6 +62,8 @@ fun NavGraphBuilder.auth() {
 
                 is AuthEvent.UpdateSuccessMessage -> {
                     messageBarState.addSuccess(event.message)
+                    delay(600L)
+                    navigateToHomeScreen()
                 }
 
                 null -> {}
@@ -72,7 +79,9 @@ private fun AuthView(
     action: (AuthAction) -> Unit
 ) {
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
     ) { contentPadding ->
         ContentWithMessageBar(
             modifier = Modifier
@@ -88,6 +97,7 @@ private fun AuthView(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(Resources.appColors.surface)
                     .padding(horizontal = 24.dp)
             ) {
                 Column(
@@ -117,7 +127,6 @@ private fun AuthView(
                 }
 
                 GoogleButtonUiContainerFirebase(
-                    filterByAuthorizedAccounts = false,
                     linkAccount = false,
                     onResult = { result ->
                         action(AuthAction.OnSignUpResult(result))

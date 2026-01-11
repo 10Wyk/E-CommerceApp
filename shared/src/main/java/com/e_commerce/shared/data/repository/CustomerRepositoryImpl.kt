@@ -12,6 +12,7 @@ class CustomerRepositoryImpl(
     private val resourceManager: ResourceManager
 ) : CustomerRepository {
     private val customerCollection = Firebase.firestore.collection(collectionPath = "customer")
+
     override fun currentUserId(): String? {
         return Firebase.auth.currentUser?.uid
     }

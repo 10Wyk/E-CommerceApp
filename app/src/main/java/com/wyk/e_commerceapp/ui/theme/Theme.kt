@@ -1,9 +1,11 @@
 package com.wyk.e_commerceapp.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 import com.e_commerce.shared.presentation.AppColor
 import com.e_commerce.shared.presentation.Black
 import com.e_commerce.shared.presentation.Gray
@@ -47,8 +49,9 @@ fun ECommerceAppTheme(
         else -> lightColors
     }
 
-    MaterialTheme(
-        typography = Typography,
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = appColor.surface,
         content = {
             CompositionLocalProvider(
                 LocalAppColor provides appColor
