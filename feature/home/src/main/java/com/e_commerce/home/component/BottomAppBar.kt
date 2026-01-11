@@ -18,16 +18,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.e_commerce.home.model.BottomBarRoute
 import com.e_commerce.shared.presentation.PreviewTheme
 import com.e_commerce.shared.presentation.Resources
@@ -35,17 +31,10 @@ import com.e_commerce.shared.presentation.Resources
 @Composable
 internal fun BottomAppBar(
     modifier: Modifier = Modifier,
-    navController: NavController,
-    badgedRoute: BottomBarRoute? = null
+    selectedBottomBarRoute: BottomBarRoute,
+    badgedRoute: BottomBarRoute? = null,
+    onSelect: (BottomBarRoute) -> Unit
 ) {
-    val backStack = navController.currentBackStackEntryAsState().value
-    val selectedBottomBarRoute = remember(backStack) {
-        val currentDestination = backStack?.destination
-        BottomBarRoute.entries.find { bottomBarRoute ->
-            bottomBarRoute.route.toString().contains(currentDestination?.route.toString())
-        } ?: BottomBarRoute.ProductOverview
-    }
-
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -67,13 +56,7 @@ internal fun BottomAppBar(
 
                 IconButton(
                     onClick = {
-                        navController.navigate(route.route) {
-                            popUpTo(BottomBarRoute.ProductOverview.route) {
-                                saveState = true
-                            }
-                            restoreState = true
-                            launchSingleTop = true
-                        }
+                        onSelect(route)
                     },
                     shape = RoundedCornerShape(9.dp)
                 ) {
@@ -113,8 +96,9 @@ private fun BottomAppBarPrev() {
         ) {
             BottomAppBar(
                 modifier = Modifier.padding(horizontal = 12.dp),
-                navController = rememberNavController(),
-                badgedRoute = BottomBarRoute.Cart
+                onSelect = {},
+                badgedRoute = BottomBarRoute.Cart,
+                selectedBottomBarRoute = BottomBarRoute.Cart
             )
         }
     }
