@@ -10,4 +10,6 @@ interface CustomerRepository {
         onSuccess: () -> Unit,
         onError: (error: String) -> Unit
     )
+
+    suspend fun signOut()
 }

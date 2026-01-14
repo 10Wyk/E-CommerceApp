@@ -41,6 +41,12 @@ fun AppNavController(
                 }
             }
         }
-        homeGraph()
+        homeGraph {
+            navController.navigate(AuthScreen) {
+                popUpTo(HomeGraph) {
+                    inclusive = true
+                }
+            }
+        }
     }
 }

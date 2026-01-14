@@ -62,7 +62,7 @@ fun NavGraphBuilder.auth(
 
                 is AuthEvent.UpdateSuccessMessage -> {
                     messageBarState.addSuccess(event.message)
-                    delay(600L)
+                    delay(500L)
                     navigateToHomeScreen()
                 }
 
@@ -80,8 +80,8 @@ private fun AuthView(
 ) {
     Scaffold(
         modifier = Modifier
-            .fillMaxSize()
             .systemBarsPadding()
+            .fillMaxSize()
     ) { contentPadding ->
         ContentWithMessageBar(
             modifier = Modifier

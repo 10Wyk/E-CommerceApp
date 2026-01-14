@@ -41,4 +41,8 @@ class CustomerRepositoryImpl(
             )
         }
     }
+
+    override suspend fun signOut() {
+        Firebase.auth.signOut()
+    }
 }
