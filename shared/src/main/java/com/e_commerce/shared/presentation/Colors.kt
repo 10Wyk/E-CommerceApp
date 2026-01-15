@@ -42,7 +42,7 @@ data class AppColor(
 
     val iconPrimary: Color,
     val iconSecondary: Color,
-    val uconWhite: Color
+    val iconWhite: Color
 )
 
 val LocalAppColor = compositionLocalOf<AppColor> { error("App color is not provided") }

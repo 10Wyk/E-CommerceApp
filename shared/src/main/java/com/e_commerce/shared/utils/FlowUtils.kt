@@ -1,4 +1,4 @@
-package com.e_commerce.shared.util
+package com.e_commerce.shared.utils
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
@@ -6,7 +6,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 @SuppressLint("ComposableNaming")
 @Composable
@@ -18,9 +20,11 @@ fun <T> Flow<T>.collectAsOneTimeEvent(
 
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.repeatOnLifecycle(lifecycleState) {
-            collect { action ->
-                action?.let {
-                    collector.invoke(action)
+            withContext(Dispatchers.Main.immediate) {
+                collect { action ->
+                    action?.let {
+                        collector.invoke(action)
+                    }
                 }
             }
         }

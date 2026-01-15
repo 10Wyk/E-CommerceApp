@@ -1,6 +1,7 @@
 package com.e_commerce.shared.domain.repository
 
 import com.e_commerce.shared.domain.model.Customer
+import com.e_commerce.shared.utils.RequestState
 
 interface CustomerRepository {
     fun currentUserId(): String?
@@ -11,5 +12,5 @@ interface CustomerRepository {
         onError: (error: String) -> Unit
     )
 
-    suspend fun signOut()
+    suspend fun signOut(): RequestState<Unit>
 }

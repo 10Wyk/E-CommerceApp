@@ -4,9 +4,11 @@ import com.e_commerce.shared.R
 import com.e_commerce.shared.domain.model.Customer
 import com.e_commerce.shared.domain.repository.CustomerRepository
 import com.e_commerce.shared.domain.resourceManager.ResourceManager
+import com.e_commerce.shared.utils.RequestState
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.firestore
+import kotlinx.coroutines.CancellationException
 
 class CustomerRepositoryImpl(
     private val resourceManager: ResourceManager
@@ -42,7 +44,14 @@ class CustomerRepositoryImpl(
         }
     }
 
-    override suspend fun signOut() {
-        Firebase.auth.signOut()
+    override suspend fun signOut(): RequestState<Unit> {
+        try {
+            Firebase.auth.signOut()
+            return RequestState.Success(data = Unit)
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            return RequestState.Error(message = exception.message ?: "Unexpected Error")
+        }
     }
 }

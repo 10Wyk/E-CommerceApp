@@ -31,7 +31,7 @@ import com.e_commerce.shared.presentation.FontSize
 import com.e_commerce.shared.presentation.PreviewTheme
 import com.e_commerce.shared.presentation.Resources
 import com.e_commerce.shared.presentation.RobotoCondensedMediumFont
-import com.e_commerce.shared.util.collectAsOneTimeEvent
+import com.e_commerce.shared.utils.collectAsOneTimeEvent
 import com.mmk.kmpauth.firebase.google.GoogleButtonUiContainerFirebase
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable

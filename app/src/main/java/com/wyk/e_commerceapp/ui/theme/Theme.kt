@@ -36,7 +36,7 @@ private val lightColors = AppColor(
     buttonDisabled = GrayDarker,
     iconPrimary = Black,
     iconSecondary = Orange,
-    uconWhite = White
+    iconWhite = White
 )
 
 @Composable
