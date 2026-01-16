@@ -60,6 +60,7 @@ import com.e_commerce.shared.presentation.BebasNeueRegularFont
 import com.e_commerce.shared.presentation.FontSize
 import com.e_commerce.shared.presentation.Resources
 import com.e_commerce.shared.presentation.utils.ScreenSize
+import com.e_commerce.shared.presentation.utils.onSwipeLeft
 import com.e_commerce.shared.utils.collectAsOneTimeEvent
 import com.e_commerce.shared.utils.ifNotBlank
 import kotlinx.coroutines.delay
@@ -195,6 +196,9 @@ private fun Home(
                             if (state.drawerState.isOpened()) action(HomeAction.OnToggleDrawer)
                         }
                     )
+                }
+                .onSwipeLeft {
+                    action(HomeAction.OnToggleDrawer)
                 }
         ) {
             Scaffold(
