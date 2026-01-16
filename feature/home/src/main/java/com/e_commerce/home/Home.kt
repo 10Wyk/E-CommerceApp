@@ -12,6 +12,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -38,6 +39,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -187,6 +189,13 @@ private fun Home(
                     ambientColor = Color.Black.copy(alpha = 0.4f),
                     spotColor = Color.Black.copy(alpha = 0.4f)
                 )
+                .pointerInput(state.drawerState) {
+                    detectTapGestures(
+                        onTap = {
+                            if (state.drawerState.isOpened()) action(HomeAction.OnToggleDrawer)
+                        }
+                    )
+                }
         ) {
             Scaffold(
                 modifier = Modifier
