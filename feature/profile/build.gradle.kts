@@ -1,41 +1,18 @@
-import com.wyk.buildsrc.escaped
-import com.wyk.buildsrc.getProperty
-
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlinx.serialization.plugin)
-    alias(libs.plugins.google.services)
 }
 
 android {
-    namespace = "com.wyk.e_commerceapp"
+    namespace = "com.e_commerce.profile"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.wyk.e_commerceapp"
         minSdk = 26
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField(
-            "String",
-            "WEB_CLIENT_ID",
-            getProperty(rootProject, "server.client.id").escaped()
-        )
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -48,7 +25,6 @@ android {
     }
     buildFeatures {
         compose = true
-        buildConfig = true
     }
 }
 
@@ -75,13 +51,10 @@ dependencies {
     implementation(libs.bundles.koin)
     implementation(libs.datastore)
     implementation(libs.datastore.preferences)
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okHttp)
     implementation(libs.messagebar)
-    implementation(libs.core.splashscreen)
-    implementation(libs.firebase.app)
+    implementation(libs.bundles.firebase)
     implementation(libs.auth.kmp)
     implementation(libs.auth.firebase.kmp)
+    runtimeOnly(libs.androidx.lifecycle.viewmodel.compose)
     implementation(project(":shared"))
-    implementation(project(":navigation"))
 }

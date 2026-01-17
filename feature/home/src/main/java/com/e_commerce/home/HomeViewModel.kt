@@ -9,8 +9,10 @@ import com.e_commerce.home.model.HomeUiState
 import com.e_commerce.shared.di.DiHelper
 import com.e_commerce.shared.domain.repository.CustomerRepository
 import com.e_commerce.shared.domain.resourceManager.ResourceManager
+import com.e_commerce.shared.presentation.navigation.Screen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -34,7 +36,12 @@ class HomeViewModel : ViewModel() {
         when (action) {
             HomeAction.OnSignOutClick -> signOutClick()
             HomeAction.OnToggleDrawer -> toggleDrawer()
+            HomeAction.OnProfileClick -> profileClick()
         }
+    }
+
+    private fun profileClick() {
+        _eventChannel.trySend(HomeEvent.NavigateToScreen(Screen.Profile))
     }
 
     private fun toggleDrawer() {
@@ -59,8 +66,11 @@ class HomeViewModel : ViewModel() {
                     )
                 }
 
-                if (response.isSuccess())
+                if (response.isSuccess()) {
                     _eventChannel.trySend(HomeEvent.UpdateSuccessMessage("Success sign out"))
+                    delay(500)
+                    _eventChannel.trySend(HomeEvent.NavigateToScreen(Screen.Auth))
+                }
                 else if (response.isError())
                     _eventChannel.trySend(HomeEvent.UpdateErrorMessage(response.getErrorMessage()))
 

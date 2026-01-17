@@ -64,10 +64,10 @@ import com.e_commerce.shared.presentation.utils.ScreenSize
 import com.e_commerce.shared.presentation.utils.onSwipeLeft
 import com.e_commerce.shared.utils.collectAsOneTimeEvent
 import com.e_commerce.shared.utils.ifNotBlank
-import kotlinx.coroutines.delay
 import rememberMessageBarState
 
 fun NavGraphBuilder.homeGraph(
+    navigateToProfile: () -> Unit,
     navigateToAuth: () -> Unit
 ) {
     composable<Screen.HomeGraph> {
@@ -90,9 +90,13 @@ fun NavGraphBuilder.homeGraph(
                 is HomeEvent.UpdateSuccessMessage -> {
                     event.message.ifNotBlank {
                         messageBarState.addSuccess(event.message)
-                        delay(500)
                     }
-                    navigateToAuth.invoke()
+                }
+
+                is HomeEvent.NavigateToScreen -> when (event.screen) {
+                    Screen.Auth -> navigateToAuth.invoke()
+                    Screen.Profile -> navigateToProfile.invoke()
+                    else -> {}
                 }
             }
         }
@@ -163,7 +167,9 @@ private fun Home(
         CustomNavigationDrawer(
             onAdminClick = {},
             onContactClick = {},
-            onProfileClick = {},
+            onProfileClick = {
+                action(HomeAction.OnProfileClick)
+            },
             onSignOutClick = {
                 action(HomeAction.OnSignOutClick)
             }

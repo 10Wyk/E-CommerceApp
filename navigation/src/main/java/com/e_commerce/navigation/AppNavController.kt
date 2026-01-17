@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.e_commerce.auth.auth
 import com.e_commerce.home.homeGraph
+import com.e_commerce.profile.profile
 import com.e_commerce.shared.domain.repository.CustomerRepository
 import com.e_commerce.shared.presentation.navigation.Screen
 import org.koin.compose.koinInject
@@ -38,12 +39,18 @@ fun AppNavController(
                 }
             }
         }
-        homeGraph {
-            navController.navigate(Screen.Auth) {
-                popUpTo(Screen.HomeGraph) {
-                    inclusive = true
+        homeGraph(
+            navigateToAuth = {
+                navController.navigate(Screen.Auth) {
+                    popUpTo(Screen.HomeGraph) {
+                        inclusive = true
+                    }
                 }
+            },
+            navigateToProfile = {
+                navController.navigate(Screen.Profile)
             }
-        }
+        )
+        profile()
     }
 }
