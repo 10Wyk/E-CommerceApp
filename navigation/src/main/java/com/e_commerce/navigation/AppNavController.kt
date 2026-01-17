@@ -1,6 +1,5 @@
 package com.e_commerce.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +21,6 @@ fun AppNavController(
     val customerRepository = koinInject<CustomerRepository>()
     val navController = rememberNavController()
     val isUserAuthenticated by remember {
-        Log.d("Current user data", customerRepository.currentUserId().toString())
         mutableStateOf(customerRepository.currentUserId() != null)
     }
     val startDestination = remember {

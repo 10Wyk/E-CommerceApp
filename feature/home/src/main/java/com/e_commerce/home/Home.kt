@@ -83,7 +83,7 @@ fun NavGraphBuilder.homeGraph(
     navigateToAuth: () -> Unit
 ) {
     composable<HomeGraph> {
-        val viewModel = viewModel { HomeViewModel() }
+        val viewModel: HomeViewModel = viewModel()
         val state = viewModel.state.collectAsStateWithLifecycle().value
         val messageBarState = rememberMessageBarState()
 
