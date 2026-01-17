@@ -201,94 +201,95 @@ private fun Home(
                     action(HomeAction.OnToggleDrawer)
                 }
         ) {
-            Scaffold(
-                modifier = Modifier
-                    .background(color = Resources.appColors.surface)
-                    .fillMaxSize(),
-                topBar = {
-                    CenterAlignedTopAppBar(
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Resources.appColors.surface,
-                            navigationIconContentColor = Resources.appColors.iconPrimary,
-                            titleContentColor = Resources.appColors.textPrimary
-                        ),
-                        title = {
-                            AnimatedContent(
-                                targetState = selectedBottomBarRoute,
-                                transitionSpec = {
-                                    if (targetState.ordinal > initialState.ordinal) {
-                                        slideInVertically { height -> height } togetherWith
-                                                slideOutVertically { height -> -height }
-                                    } else {
-                                        slideInVertically { height -> -height } togetherWith
-                                                slideOutVertically { height -> height }
-                                    }
-                                },
-                                contentAlignment = Alignment.Center
-                            ) { route ->
-                                Text(
-                                    text = route.title,
-                                    fontFamily = BebasNeueRegularFont(),
-                                    fontSize = FontSize.LARGE
-                                )
-                            }
-                        },
-                        navigationIcon = {
-                            AnimatedContent(targetState = state.drawerState) { state ->
-                                when (state) {
-                                    DrawerState.Closed -> IconButton(onClick = {
-                                        action(HomeAction.OnToggleDrawer)
-                                    }) {
-                                        Icon(
-                                            painter = painterResource(Resources.Icon.Menu),
-                                            contentDescription = null,
-                                        )
-                                    }
 
-                                    DrawerState.Opened -> IconButton(onClick = {
-                                        action(HomeAction.OnToggleDrawer)
-                                    }) {
-                                        Icon(
-                                            painter = painterResource(Resources.Icon.Close),
-                                            contentDescription = null,
-                                        )
+            ContentWithMessageBar(
+                modifier = Modifier
+                    .fillMaxSize(),
+                messageBarState = messageBarState,
+                errorMaxLines = 2,
+                errorContainerColor = Resources.appColors.surfaceError,
+                errorContentColor = Resources.appColors.textWhite,
+                successContainerColor = Resources.appColors.surfaceBrand,
+                successContentColor = Resources.appColors.textPrimary
+            ) {
+                Scaffold(
+                    modifier = Modifier
+                        .background(color = Resources.appColors.surface)
+                        .fillMaxSize(),
+                    topBar = {
+                        CenterAlignedTopAppBar(
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = Resources.appColors.surface,
+                                navigationIconContentColor = Resources.appColors.iconPrimary,
+                                titleContentColor = Resources.appColors.textPrimary
+                            ),
+                            title = {
+                                AnimatedContent(
+                                    targetState = selectedBottomBarRoute,
+                                    transitionSpec = {
+                                        if (targetState.ordinal > initialState.ordinal) {
+                                            slideInVertically { height -> height } togetherWith
+                                                    slideOutVertically { height -> -height }
+                                        } else {
+                                            slideInVertically { height -> -height } togetherWith
+                                                    slideOutVertically { height -> height }
+                                        }
+                                    },
+                                    contentAlignment = Alignment.Center
+                                ) { route ->
+                                    Text(
+                                        text = route.title,
+                                        fontFamily = BebasNeueRegularFont(),
+                                        fontSize = FontSize.LARGE
+                                    )
+                                }
+                            },
+                            navigationIcon = {
+                                AnimatedContent(targetState = state.drawerState) { state ->
+                                    when (state) {
+                                        DrawerState.Closed -> IconButton(onClick = {
+                                            action(HomeAction.OnToggleDrawer)
+                                        }) {
+                                            Icon(
+                                                painter = painterResource(Resources.Icon.Menu),
+                                                contentDescription = null,
+                                            )
+                                        }
+
+                                        DrawerState.Opened -> IconButton(onClick = {
+                                            action(HomeAction.OnToggleDrawer)
+                                        }) {
+                                            Icon(
+                                                painter = painterResource(Resources.Icon.Close),
+                                                contentDescription = null,
+                                            )
+                                        }
                                     }
                                 }
                             }
-                        }
-                    )
-                },
-                bottomBar = {
-                    BottomAppBar(
-                        modifier = Modifier
-                            .background(color = Resources.appColors.surface)
-                            .padding(12.dp),
-                        selectedBottomBarRoute = selectedBottomBarRoute,
-                        onSelect = { route ->
-                            navController.navigate(route.route) {
-                                popUpTo(BottomBarRoute.ProductOverview.route) {
-                                    saveState = true
+                        )
+                    },
+                    bottomBar = {
+                        BottomAppBar(
+                            modifier = Modifier
+                                .background(color = Resources.appColors.surface)
+                                .padding(12.dp),
+                            selectedBottomBarRoute = selectedBottomBarRoute,
+                            onSelect = { route ->
+                                navController.navigate(route.route) {
+                                    popUpTo(BottomBarRoute.ProductOverview.route) {
+                                        saveState = true
+                                    }
+                                    restoreState = true
+                                    launchSingleTop = true
                                 }
-                                restoreState = true
-                                launchSingleTop = true
                             }
-                        }
-                    )
-                }
-            ) { innerPadding ->
-                ContentWithMessageBar(
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .fillMaxSize(),
-                    messageBarState = messageBarState,
-                    errorMaxLines = 2,
-                    errorContainerColor = Resources.appColors.surfaceError,
-                    errorContentColor = Resources.appColors.textWhite,
-                    successContainerColor = Resources.appColors.surfaceBrand,
-                    successContentColor = Resources.appColors.textPrimary
-                ) {
+                        )
+                    }
+                ) { innerPadding ->
                     NavHost(
                         modifier = Modifier
+                            .padding(innerPadding)
                             .fillMaxSize()
                             .background(color = Resources.appColors.surface),
                         navController = navController,
