@@ -1,4 +1,4 @@
-package com.e_commerce.shared.presentation.component
+package com.e_commerce.shared.presentation.component.textfield
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.border

@@ -44,7 +44,7 @@ fun NavGraphBuilder.auth(
     navigateToHomeScreen: () -> Unit
 ) {
     composable<AuthScreen> {
-        val viewModel = viewModel { AuthViewModel() }
+        val viewModel: AuthViewModel = viewModel()
         val loadingState = viewModel.state.collectAsStateWithLifecycle().value
         val messageBarState = rememberMessageBarState()
 
