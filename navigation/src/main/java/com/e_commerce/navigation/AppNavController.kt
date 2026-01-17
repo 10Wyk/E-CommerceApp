@@ -7,11 +7,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.e_commerce.auth.AuthScreen
 import com.e_commerce.auth.auth
-import com.e_commerce.home.HomeGraph
 import com.e_commerce.home.homeGraph
 import com.e_commerce.shared.domain.repository.CustomerRepository
+import com.e_commerce.shared.presentation.navigation.Screen
 import org.koin.compose.koinInject
 
 @Composable
@@ -24,7 +23,7 @@ fun AppNavController(
         mutableStateOf(customerRepository.currentUserId() != null)
     }
     val startDestination = remember {
-        if (isUserAuthenticated) HomeGraph else AuthScreen
+        if (isUserAuthenticated) Screen.HomeGraph else Screen.Auth
     }
 
     NavHost(
@@ -33,15 +32,15 @@ fun AppNavController(
         startDestination = startDestination
     ) {
         auth {
-            navController.navigate(HomeGraph) {
-                popUpTo(AuthScreen) {
+            navController.navigate(Screen.HomeGraph) {
+                popUpTo(Screen.Auth) {
                     inclusive = true
                 }
             }
         }
         homeGraph {
-            navController.navigate(AuthScreen) {
-                popUpTo(HomeGraph) {
+            navController.navigate(Screen.Auth) {
+                popUpTo(Screen.HomeGraph) {
                     inclusive = true
                 }
             }

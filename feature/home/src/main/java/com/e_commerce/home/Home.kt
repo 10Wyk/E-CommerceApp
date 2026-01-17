@@ -59,30 +59,18 @@ import com.e_commerce.home.model.HomeUiState
 import com.e_commerce.shared.presentation.BebasNeueRegularFont
 import com.e_commerce.shared.presentation.FontSize
 import com.e_commerce.shared.presentation.Resources
+import com.e_commerce.shared.presentation.navigation.Screen
 import com.e_commerce.shared.presentation.utils.ScreenSize
 import com.e_commerce.shared.presentation.utils.onSwipeLeft
 import com.e_commerce.shared.utils.collectAsOneTimeEvent
 import com.e_commerce.shared.utils.ifNotBlank
 import kotlinx.coroutines.delay
-import kotlinx.serialization.Serializable
 import rememberMessageBarState
-
-@Serializable
-object HomeGraph
-
-@Serializable
-object ProductOverview
-
-@Serializable
-object Cart
-
-@Serializable
-object Categories
 
 fun NavGraphBuilder.homeGraph(
     navigateToAuth: () -> Unit
 ) {
-    composable<HomeGraph> {
+    composable<Screen.HomeGraph> {
         val viewModel: HomeViewModel = viewModel()
         val state = viewModel.state.collectAsStateWithLifecycle().value
         val messageBarState = rememberMessageBarState()
@@ -124,7 +112,10 @@ private fun Home(
     val selectedBottomBarRoute = remember(backStack) {
         val currentDestination = backStack?.destination
         BottomBarRoute.entries.find { bottomBarRoute ->
-            bottomBarRoute.route.toString().contains(currentDestination?.route.toString())
+            val route = currentDestination?.route?.let { destRoute ->
+                destRoute.substring(destRoute.lastIndexOf('.') + 1)
+            }
+            bottomBarRoute.route.toString().contains(route.toString())
         } ?: BottomBarRoute.ProductOverview
     }
 
@@ -293,15 +284,18 @@ private fun Home(
                             .fillMaxSize()
                             .background(color = Resources.appColors.surface),
                         navController = navController,
-                        startDestination = ProductOverview
+                        startDestination = Screen.ProductOverview
                     ) {
-                        composable<ProductOverview> {
+                        composable<Screen.ProductOverview> {
+                            Text("first")
                         }
 
-                        composable<Cart> {
+                        composable<Screen.Cart> {
+                            Text("second")
                         }
 
-                        composable<Categories> {
+                        composable<Screen.Categories> {
+                            Text("third")
                         }
                     }
                 }

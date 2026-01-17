@@ -31,19 +31,16 @@ import com.e_commerce.shared.presentation.FontSize
 import com.e_commerce.shared.presentation.PreviewTheme
 import com.e_commerce.shared.presentation.Resources
 import com.e_commerce.shared.presentation.RobotoCondensedMediumFont
+import com.e_commerce.shared.presentation.navigation.Screen
 import com.e_commerce.shared.utils.collectAsOneTimeEvent
 import com.mmk.kmpauth.firebase.google.GoogleButtonUiContainerFirebase
 import kotlinx.coroutines.delay
-import kotlinx.serialization.Serializable
 import rememberMessageBarState
-
-@Serializable
-object AuthScreen
 
 fun NavGraphBuilder.auth(
     navigateToHomeScreen: () -> Unit
 ) {
-    composable<AuthScreen> {
+    composable<Screen.Auth> {
         val viewModel: AuthViewModel = viewModel()
         val loadingState = viewModel.state.collectAsStateWithLifecycle().value
         val messageBarState = rememberMessageBarState()
