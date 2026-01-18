@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.e_commerce.profile.model.ProfileAction
+import com.e_commerce.profile.model.ProfileEvent
 import com.e_commerce.profile.model.ProfileUiState
 import com.e_commerce.shared.presentation.BebasNeueRegularFont
 import com.e_commerce.shared.presentation.FontSize
@@ -35,22 +36,26 @@ import com.e_commerce.shared.presentation.Resources
 import com.e_commerce.shared.presentation.component.button.PrimaryButton
 import com.e_commerce.shared.presentation.component.textfield.CustomTextField
 import com.e_commerce.shared.presentation.navigation.Screen
+import com.e_commerce.shared.utils.collectAsOneTimeEvent
 
-fun NavGraphBuilder.profile() {
+fun NavGraphBuilder.profile(
+    navigateBack: () -> Unit
+) {
     composable<Screen.Profile> {
-        Profile()
+        val viewModel: ProfileViewModel = viewModel()
+        val state = viewModel.state.collectAsStateWithLifecycle().value
+
+        ProfileView(
+            state = state,
+            action = viewModel::actonHandler
+        )
+
+        viewModel.eventFlow.collectAsOneTimeEvent { event ->
+            when (event) {
+                ProfileEvent.NavigateBack -> navigateBack()
+            }
+        }
     }
-}
-
-@Composable
-private fun Profile() {
-    val viewModel: ProfileViewModel = viewModel()
-    val state = viewModel.state.collectAsStateWithLifecycle().value
-
-    ProfileView(
-        state = state,
-        action = viewModel::actonHandler
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,7 +85,9 @@ private fun ProfileView(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = {},
+                        onClick = {
+                            action(ProfileAction.OnNavigateBackClick)
+                        },
                     ) {
                         Icon(
                             painter = painterResource(Resources.Icon.BackArrow),
@@ -95,8 +102,8 @@ private fun ProfileView(
         Column(
             modifier = Modifier
                 .padding(contentPadding)
-                .background(color = Resources.appColors.surface)
                 .fillMaxSize()
+                .background(color = Resources.appColors.surface)
                 .padding(horizontal = 24.dp)
                 .padding(top = 12.dp, bottom = 24.dp)
                 .verticalScroll(state = rememberScrollState()),

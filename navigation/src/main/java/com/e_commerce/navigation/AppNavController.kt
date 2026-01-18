@@ -51,6 +51,8 @@ fun AppNavController(
                 navController.navigate(Screen.Profile)
             }
         )
-        profile()
+        profile {
+            navController.popBackStack()
+        }
     }
 }

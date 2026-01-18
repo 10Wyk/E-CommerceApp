@@ -7,4 +7,5 @@ sealed interface ProfileAction {
     data class OnChangePostalCode(val code: String) : ProfileAction
     data class OnChangeAddress(val address: String) : ProfileAction
     data class OnChangePhoneNumber(val phoneNumber: String) : ProfileAction
+    data object OnNavigateBackClick : ProfileAction
 }

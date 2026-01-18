@@ -3,9 +3,12 @@ package com.e_commerce.profile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.e_commerce.profile.model.ProfileAction
+import com.e_commerce.profile.model.ProfileEvent
 import com.e_commerce.profile.model.ProfileUiState
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 
 class ProfileViewModel(
@@ -13,6 +16,9 @@ class ProfileViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(ProfileUiState())
     val state = _state.asStateFlow()
+
+    private val _eventChannel = Channel<ProfileEvent>()
+    val eventFlow = _eventChannel.receiveAsFlow()
 
     fun actonHandler(action: ProfileAction) {
         when (action) {
@@ -22,7 +28,12 @@ class ProfileViewModel(
             is ProfileAction.OnChangeLastName -> changeLastName(action.lastName)
             is ProfileAction.OnChangePostalCode -> changePostalCode(action.code)
             is ProfileAction.OnChangePhoneNumber -> changePhoneNumber(action.phoneNumber)
+            ProfileAction.OnNavigateBackClick -> navigateBackClick()
         }
+    }
+
+    private fun navigateBackClick() {
+        _eventChannel.trySend(ProfileEvent.NavigateBack)
     }
 
     private fun changePhoneNumber(phoneNumber: String) {
