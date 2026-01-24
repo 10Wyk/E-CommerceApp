@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,10 +34,12 @@ import com.e_commerce.profile.model.ProfileUiState
 import com.e_commerce.shared.presentation.BebasNeueRegularFont
 import com.e_commerce.shared.presentation.FontSize
 import com.e_commerce.shared.presentation.PreviewTheme
-import com.e_commerce.shared.presentation.ProfileForm
 import com.e_commerce.shared.presentation.Resources
+import com.e_commerce.shared.presentation.component.ErrorCard
+import com.e_commerce.shared.presentation.component.ProfileForm
 import com.e_commerce.shared.presentation.component.button.PrimaryButton
 import com.e_commerce.shared.presentation.navigation.Screen
+import com.e_commerce.shared.utils.DisplayResult
 import com.e_commerce.shared.utils.collectAsOneTimeEvent
 
 fun NavGraphBuilder.profile(
@@ -100,52 +103,74 @@ private fun ProfileView(
             )
         }
     ) { contentPadding ->
-        Column(
+        state.requestState.DisplayResult(
             modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize()
-                .background(color = Resources.appColors.surface)
-                .padding(horizontal = 24.dp)
-                .padding(top = 12.dp, bottom = 24.dp)
-                .verticalScroll(state = rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            ProfileForm(
-                firstName = state.firstName,
-                onFirstNameChange = {
-                    action(ProfileAction.OnChangeFirstName(it))
-                },
-                lastName = state.lastName,
-                onLastNameChange = {
-                    action(ProfileAction.OnChangeLastName(it))
-                },
-                email = state.email,
-                city = state.city,
-                onCityChange = {
-                    action(ProfileAction.OnChangeCity(it))
-                },
-                postalCode = state.postalCode,
-                onPostalCodeChange = {
-                    action(ProfileAction.OnChangePostalCode(it))
-                },
-                address = state.address,
-                onAddressChange = {
-                    action(ProfileAction.OnChangeAddress(it))
-                },
-                phoneNumber = state.phoneNumber,
-                onPhoneNumberChange = {
-                    action(ProfileAction.OnChangePhoneNumber(it))
+                .background(color = Resources.appColors.surface),
+            onLoading = {
+                CircularProgressIndicator(
+                    color = Resources.appColors.iconSecondary
+                )
+            },
+            onError = {
+                ErrorCard(
+                    modifier = Modifier.fillMaxSize(),
+                    message = state.requestState.getErrorMessage(),
+                    fontSize = FontSize.REGULAR
+                )
+            },
+            onSuccess = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 24.dp)
+                        .padding(top = 12.dp, bottom = 24.dp)
+                        .verticalScroll(state = rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ProfileForm(
+                        firstName = state.firstName,
+                        onFirstNameChange = {
+                            action(ProfileAction.OnChangeFirstName(it))
+                        },
+                        lastName = state.lastName,
+                        onLastNameChange = {
+                            action(ProfileAction.OnChangeLastName(it))
+                        },
+                        email = state.email,
+                        city = state.city,
+                        onCityChange = {
+                            action(ProfileAction.OnChangeCity(it))
+                        },
+                        postalCode = state.postalCode,
+                        onPostalCodeChange = {
+                            action(ProfileAction.OnChangePostalCode(it))
+                        },
+                        address = state.address,
+                        onAddressChange = {
+                            action(ProfileAction.OnChangeAddress(it))
+                        },
+                        phoneNumber = state.phoneNumber,
+                        onPhoneNumberChange = {
+                            action(ProfileAction.OnChangePhoneNumber(it))
+                        },
+                        country = state.country,
+                        onCountryPick = { country ->
+                            action(ProfileAction.OnPickCountry(country))
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    PrimaryButton(
+                        text = "Update",
+                        modifier = Modifier.fillMaxWidth(),
+                        icon = Resources.Icon.Checkmark
+                    ) { }
                 }
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            PrimaryButton(
-                text = "Update",
-                modifier = Modifier.fillMaxWidth(),
-                icon = Resources.Icon.Checkmark
-            ) { }
-        }
+            }
+        )
     }
 }
 

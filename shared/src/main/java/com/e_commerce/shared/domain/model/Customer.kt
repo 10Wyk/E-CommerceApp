@@ -1,6 +1,7 @@
 package com.e_commerce.shared.domain.model
 
 import dev.gitlive.firebase.auth.FirebaseUser
+import dev.gitlive.firebase.firestore.DocumentSnapshot
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -24,6 +25,20 @@ fun FirebaseUser.toCustomer() = Customer(
     lastName = displayName?.split(" ")?.lastOrNull() ?: "Unknown",
     email = email,
     imageUrl = photoURL
+)
+
+fun DocumentSnapshot.toCustomer() = Customer(
+    id = id,
+    firstName = get("firstName"),
+    lastName = get("lastName"),
+    email = get("email"),
+    country = get("country"),
+    city = get("city"),
+    postalCode = get("postalCode"),
+    address = get("address"),
+    phoneNumber = get("phoneNumber"),
+    imageUrl = get("imageUrl"),
+    cartItems = get("cartItems"),
 )
 
 @Serializable

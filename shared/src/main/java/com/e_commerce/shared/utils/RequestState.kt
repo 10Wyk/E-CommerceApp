@@ -2,8 +2,6 @@ package com.e_commerce.shared.utils
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -55,7 +53,8 @@ fun <T> RequestState<T>.DisplayResult(
             .background(color = backgroundColor ?: Color.Unspecified),
         targetState = this,
         transitionSpec = {
-            transitionSpec ?: (EnterTransition.None togetherWith ExitTransition.None)
+            fadeIn(animationSpec = tween(220, delayMillis = 90))
+                .togetherWith(fadeOut(animationSpec = tween(90)))
         },
         label = "Content Animation"
     ) { state ->
