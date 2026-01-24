@@ -1,7 +1,6 @@
 package com.e_commerce.profile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,9 +32,10 @@ import com.e_commerce.profile.model.ProfileEvent
 import com.e_commerce.profile.model.ProfileUiState
 import com.e_commerce.shared.presentation.BebasNeueRegularFont
 import com.e_commerce.shared.presentation.FontSize
+import com.e_commerce.shared.presentation.PreviewTheme
+import com.e_commerce.shared.presentation.ProfileForm
 import com.e_commerce.shared.presentation.Resources
 import com.e_commerce.shared.presentation.component.button.PrimaryButton
-import com.e_commerce.shared.presentation.component.textfield.CustomTextField
 import com.e_commerce.shared.presentation.navigation.Screen
 import com.e_commerce.shared.utils.collectAsOneTimeEvent
 
@@ -107,54 +108,34 @@ private fun ProfileView(
                 .padding(horizontal = 24.dp)
                 .padding(top = 12.dp, bottom = 24.dp)
                 .verticalScroll(state = rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            CustomTextField(
-                value = state.firstName,
-                onValueChange = {
+            ProfileForm(
+                firstName = state.firstName,
+                onFirstNameChange = {
                     action(ProfileAction.OnChangeFirstName(it))
                 },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            CustomTextField(
-                value = state.lastName,
-                onValueChange = {
+                lastName = state.lastName,
+                onLastNameChange = {
                     action(ProfileAction.OnChangeLastName(it))
                 },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            CustomTextField(
-                value = state.email,
-                onValueChange = {},
-                enabled = false,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            CustomTextField(
-                value = state.city,
-                onValueChange = {
+                email = state.email,
+                city = state.city,
+                onCityChange = {
                     action(ProfileAction.OnChangeCity(it))
                 },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            CustomTextField(
-                value = state.postalCode,
-                onValueChange = {
+                postalCode = state.postalCode,
+                onPostalCodeChange = {
                     action(ProfileAction.OnChangePostalCode(it))
                 },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            CustomTextField(
-                value = state.address,
-                onValueChange = {
+                address = state.address,
+                onAddressChange = {
                     action(ProfileAction.OnChangeAddress(it))
                 },
-                modifier = Modifier.fillMaxWidth()
+                phoneNumber = state.phoneNumber,
+                onPhoneNumberChange = {
+                    action(ProfileAction.OnChangePhoneNumber(it))
+                }
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -165,6 +146,17 @@ private fun ProfileView(
                 icon = Resources.Icon.Checkmark
             ) { }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun ProfileViewPrev() {
+    PreviewTheme {
+        ProfileView(
+            state = ProfileUiState(),
+            action = {}
+        )
     }
 }
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -46,7 +47,11 @@ fun CustomTextField(
         errorContainerColor = Resources.appColors.borderError.copy(alpha = 0.15f),
         disabledContainerColor = Resources.appColors.surfaceDarker,
         focusedContainerColor = Resources.appColors.surfaceLighter,
-        unfocusedContainerColor = Resources.appColors.surfaceLighter
+        unfocusedContainerColor = Resources.appColors.surfaceLighter,
+        selectionColors = TextSelectionColors(
+            handleColor = Resources.appColors.surfaceSecondary,
+            backgroundColor = Resources.appColors.surfaceSecondary.copy(alpha = 0.1f)
+        )
     )
 
     val borderColors by animateColorAsState(

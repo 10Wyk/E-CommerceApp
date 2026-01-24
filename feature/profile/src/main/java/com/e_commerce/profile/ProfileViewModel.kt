@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.e_commerce.profile.model.ProfileAction
 import com.e_commerce.profile.model.ProfileEvent
 import com.e_commerce.profile.model.ProfileUiState
+import com.e_commerce.shared.utils.asInt
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,8 +47,9 @@ class ProfileViewModel(
 
     private fun changePostalCode(code: String) {
         _state.update { state ->
+            val postalCode = code.asInt() ?: return
             state.copy(
-                postalCode = code
+                postalCode = postalCode
             )
         }
     }
