@@ -90,8 +90,6 @@ class CustomerRepositoryImpl(
                 is ConnectException, is SSLHandshakeException, is FirebaseException,
                 is IOException -> resourceManager.readString(R.string.msg_internet_not_available)
 
-                is IllegalStateException -> resourceManager.readString(R.string.msg_sign_in_canceled)
-
                 else -> "Error while reading a Customer information: ${exception.message}"
             }
             send(RequestState.Error(message))
@@ -124,8 +122,6 @@ class CustomerRepositoryImpl(
                 is ConnectException, is SSLHandshakeException, is FirebaseException,
                 is IOException -> resourceManager.readString(R.string.msg_internet_not_available)
 
-                is IllegalStateException -> resourceManager.readString(R.string.msg_sign_in_canceled)
-
                 else -> "Error updating a Customer information: ${exception.message}"
             }
             onError(message)
@@ -143,8 +139,6 @@ class CustomerRepositoryImpl(
                 is UnresolvedAddressException, is UnknownHostException,
                 is ConnectException, is SSLHandshakeException, is FirebaseException,
                 is IOException -> resourceManager.readString(R.string.msg_internet_not_available)
-
-                is IllegalStateException -> resourceManager.readString(R.string.msg_sign_in_canceled)
 
                 else -> exception.message ?: resourceManager.readString(R.string.lbl_unknown)
             }

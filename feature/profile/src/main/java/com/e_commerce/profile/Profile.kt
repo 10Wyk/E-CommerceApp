@@ -37,7 +37,7 @@ import com.e_commerce.shared.presentation.BebasNeueRegularFont
 import com.e_commerce.shared.presentation.FontSize
 import com.e_commerce.shared.presentation.PreviewTheme
 import com.e_commerce.shared.presentation.Resources
-import com.e_commerce.shared.presentation.component.ErrorCard
+import com.e_commerce.shared.presentation.component.InfoCard
 import com.e_commerce.shared.presentation.component.ProfileForm
 import com.e_commerce.shared.presentation.component.button.PrimaryButton
 import com.e_commerce.shared.presentation.navigation.Screen
@@ -133,10 +133,11 @@ private fun ProfileView(
                     )
                 },
                 onError = {
-                    ErrorCard(
+                    InfoCard(
                         modifier = Modifier.fillMaxSize(),
-                        message = state.requestState.getErrorMessage(),
-                        fontSize = FontSize.REGULAR
+                        title = "Oops!",
+                        subTitle = state.requestState.getErrorMessage(),
+                        image = Resources.Image.Cat
                     )
                 },
                 onSuccess = {

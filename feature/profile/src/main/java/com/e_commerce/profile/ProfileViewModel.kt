@@ -205,8 +205,6 @@ class ProfileViewModel(
                     _eventChannel.trySend(ProfileEvent.UpdateSuccessMessage("Customer updated successfully"))
                 },
                 onError = { errorMsg ->
-
-                    println("Here the error")
                     _state.update { state ->
                         state.copy(
                             requestState = RequestState.Error(errorMsg)
