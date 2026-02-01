@@ -44,7 +44,7 @@ fun CustomTextField(
         focusedIndicatorColor = Color.Transparent,
         disabledIndicatorColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
-        errorContainerColor = Resources.appColors.borderError.copy(alpha = 0.15f),
+        errorContainerColor = Resources.appColors.borderError.copy(alpha = 0.05f),
         disabledContainerColor = Resources.appColors.surfaceDarker,
         focusedContainerColor = Resources.appColors.surfaceLighter,
         unfocusedContainerColor = Resources.appColors.surfaceLighter,

@@ -9,7 +9,6 @@ import com.e_commerce.shared.di.DiHelper
 import com.e_commerce.shared.domain.model.toCustomer
 import com.e_commerce.shared.domain.repository.CustomerRepository
 import com.e_commerce.shared.domain.resourceManager.ResourceManager
-import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -18,11 +17,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import okio.IOException
-import java.net.ConnectException
-import java.net.UnknownHostException
-import java.nio.channels.UnresolvedAddressException
-import javax.net.ssl.SSLHandshakeException
 
 class AuthViewModel : ViewModel() {
     private val _state = MutableStateFlow(false)
@@ -68,34 +62,11 @@ class AuthViewModel : ViewModel() {
                     }
                 )
             }.onFailure { throwable ->
-                println(throwable)
-
-                when (throwable) {
-                    is UnresolvedAddressException, is UnknownHostException,
-                    is ConnectException, is SSLHandshakeException, is FirebaseException,
-                    is IOException ->
-                        _eventChannel.trySend(
-                            AuthEvent.UpdateErrorMessage(
-                                diComponent.resourceManager.readString(R.string.msg_internet_not_available)
-                            )
-                        )
-
-                    is IllegalStateException ->
-                        _eventChannel.trySend(
-                            AuthEvent.UpdateErrorMessage(
-                                diComponent.resourceManager.readString(
-                                    R.string.msg_sign_in_canceled
-                                )
-                            )
-                        )
-
-                    else -> _eventChannel.trySend(
-                        AuthEvent.UpdateErrorMessage(
-                            throwable.message
-                                ?: diComponent.resourceManager.readString(R.string.lbl_unknown)
-                        )
+                _eventChannel.trySend(
+                    AuthEvent.UpdateErrorMessage(
+                        throwable.message.orEmpty()
                     )
-                }
+                )
             }
         }
     }

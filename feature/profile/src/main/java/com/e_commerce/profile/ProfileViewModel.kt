@@ -8,6 +8,7 @@ import com.e_commerce.profile.model.ProfileEvent
 import com.e_commerce.profile.model.ProfileUiState
 import com.e_commerce.shared.di.DiHelper
 import com.e_commerce.shared.domain.model.Country
+import com.e_commerce.shared.domain.model.PhoneNumber
 import com.e_commerce.shared.domain.repository.CustomerRepository
 import com.e_commerce.shared.utils.RequestState
 import kotlinx.coroutines.channels.Channel
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(
@@ -47,6 +49,7 @@ class ProfileViewModel(
             is ProfileAction.OnChangePhoneNumber -> changePhoneNumber(action.phoneNumber)
             is ProfileAction.OnPickCountry -> onPickCountry(action.country)
             ProfileAction.OnNavigateBackClick -> navigateBackClick()
+            ProfileAction.OnUpdateCustomerClick -> updateCustomer()
         }
     }
 
@@ -82,7 +85,10 @@ class ProfileViewModel(
     private fun changeLastName(lastName: String) {
         _state.update { state ->
             state.copy(
-                lastName = lastName
+                lastName = lastName,
+                profileValidity = state.profileValidity.copy(
+                    isLastNameValid = true
+                )
             )
         }
     }
@@ -90,7 +96,10 @@ class ProfileViewModel(
     private fun changeFirstName(firstName: String) {
         _state.update { state ->
             state.copy(
-                firstName = firstName
+                firstName = firstName,
+                profileValidity = state.profileValidity.copy(
+                    isFirstNameValid = true
+                )
             )
         }
     }
@@ -128,6 +137,8 @@ class ProfileViewModel(
                             requestState = RequestState.Error(throwable.message.orEmpty())
                         )
                     }
+
+                    _eventChannel.trySend(ProfileEvent.UpdateErrorMessage(throwable.message.orEmpty()))
                 }
                 .collectLatest { customerData ->
                     if (customerData.isSuccess()) {
@@ -141,17 +152,87 @@ class ProfileViewModel(
                                 postalCode = customerData.getSuccessData().postalCode,
                                 address = customerData.getSuccessData().address,
                                 phoneNumber = customerData.getSuccessData().phoneNumber?.number,
-                                country = Country.findByDialCode(customerData.getSuccessData().phoneNumber?.dialCode)
+                                country = Country.findByDialCode(customerData.getSuccessData().phoneNumber?.dialCode),
+                                customer = customerData.getSuccessData()
                             )
                         }
+
+                        _eventChannel.trySend(ProfileEvent.UpdateSuccessMessage("Fetched customer data successfully"))
                     } else if (customerData.isError()) {
                         _state.update { state ->
                             state.copy(
                                 requestState = RequestState.Error(customerData.getErrorMessage())
                             )
                         }
+
+                        _eventChannel.trySend(ProfileEvent.UpdateErrorMessage(customerData.getErrorMessage()))
                     }
                 }
         }
+    }
+
+    private fun updateCustomer() {
+        if (!isValid()) return
+
+        viewModelScope.launch {
+            _state.update { state ->
+                state.copy(
+                    requestState = RequestState.Loading
+                )
+            }
+
+            val state = state.value
+            diComponent.customerRepository.updateCustomer(
+                customer = state.customer!!.copy(
+                    lastName = state.lastName,
+                    firstName = state.firstName,
+                    address = state.address,
+                    city = state.city,
+                    postalCode = state.postalCode,
+                    phoneNumber = PhoneNumber(
+                        dialCode = state.country.dialCode,
+                        number = state.phoneNumber
+                    ),
+                    country = state.country.name
+                ),
+                onSuccess = {
+                    _state.update { state ->
+                        state.copy(
+                            requestState = RequestState.Success(Unit)
+                        )
+                    }
+
+                    _eventChannel.trySend(ProfileEvent.UpdateSuccessMessage("Customer updated successfully"))
+                },
+                onError = { errorMsg ->
+
+                    println("Here the error")
+                    _state.update { state ->
+                        state.copy(
+                            requestState = RequestState.Error(errorMsg)
+                        )
+                    }
+
+                    _eventChannel.trySend(ProfileEvent.UpdateErrorMessage(errorMsg))
+                }
+            )
+        }
+    }
+
+    private fun isValid(): Boolean {
+        val state = state.value
+
+        val validity = state.profileValidity.copy(
+            isFirstNameValid = state.firstName.isNotBlank(),
+            isLastNameValid = state.lastName.isNotBlank()
+        )
+
+        val updatedState = _state.updateAndGet { state ->
+            state.copy(
+                profileValidity = validity
+            )
+        }
+
+        return updatedState.profileValidity.isValid()
     }
 }

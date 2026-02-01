@@ -1,5 +1,7 @@
 package com.e_commerce.profile
 
+import ContentWithMessageBar
+import MessageBarState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -41,6 +43,7 @@ import com.e_commerce.shared.presentation.component.button.PrimaryButton
 import com.e_commerce.shared.presentation.navigation.Screen
 import com.e_commerce.shared.utils.DisplayResult
 import com.e_commerce.shared.utils.collectAsOneTimeEvent
+import rememberMessageBarState
 
 fun NavGraphBuilder.profile(
     navigateBack: () -> Unit
@@ -49,14 +52,19 @@ fun NavGraphBuilder.profile(
         val viewModel: ProfileViewModel = viewModel()
         val state = viewModel.state.collectAsStateWithLifecycle().value
 
+        val messageBarState = rememberMessageBarState()
+
         ProfileView(
             state = state,
+            messageBarState = messageBarState,
             action = viewModel::actonHandler
         )
 
         viewModel.eventFlow.collectAsOneTimeEvent { event ->
             when (event) {
                 ProfileEvent.NavigateBack -> navigateBack()
+                is ProfileEvent.UpdateErrorMessage -> messageBarState.addError(event.message)
+                is ProfileEvent.UpdateSuccessMessage -> messageBarState.addSuccess(event.message)
             }
         }
     }
@@ -66,6 +74,7 @@ fun NavGraphBuilder.profile(
 @Composable
 private fun ProfileView(
     state: ProfileUiState,
+    messageBarState: MessageBarState,
     action: (ProfileAction) -> Unit
 ) {
     Scaffold(
@@ -103,74 +112,89 @@ private fun ProfileView(
             )
         }
     ) { contentPadding ->
-        state.requestState.DisplayResult(
+        ContentWithMessageBar(
+            messageBarState = messageBarState,
             modifier = Modifier
                 .padding(contentPadding)
-                .fillMaxSize()
-                .background(color = Resources.appColors.surface),
-            onLoading = {
-                CircularProgressIndicator(
-                    color = Resources.appColors.iconSecondary
-                )
-            },
-            onError = {
-                ErrorCard(
-                    modifier = Modifier.fillMaxSize(),
-                    message = state.requestState.getErrorMessage(),
-                    fontSize = FontSize.REGULAR
-                )
-            },
-            onSuccess = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 24.dp)
-                        .padding(top = 12.dp, bottom = 24.dp)
-                        .verticalScroll(state = rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    ProfileForm(
-                        firstName = state.firstName,
-                        onFirstNameChange = {
-                            action(ProfileAction.OnChangeFirstName(it))
-                        },
-                        lastName = state.lastName,
-                        onLastNameChange = {
-                            action(ProfileAction.OnChangeLastName(it))
-                        },
-                        email = state.email,
-                        city = state.city,
-                        onCityChange = {
-                            action(ProfileAction.OnChangeCity(it))
-                        },
-                        postalCode = state.postalCode,
-                        onPostalCodeChange = {
-                            action(ProfileAction.OnChangePostalCode(it))
-                        },
-                        address = state.address,
-                        onAddressChange = {
-                            action(ProfileAction.OnChangeAddress(it))
-                        },
-                        phoneNumber = state.phoneNumber,
-                        onPhoneNumberChange = {
-                            action(ProfileAction.OnChangePhoneNumber(it))
-                        },
-                        country = state.country,
-                        onCountryPick = { country ->
-                            action(ProfileAction.OnPickCountry(country))
-                        }
+                .fillMaxSize(),
+            errorMaxLines = 2,
+            errorContainerColor = Resources.appColors.surfaceError,
+            errorContentColor = Resources.appColors.textWhite,
+            successContainerColor = Resources.appColors.surfaceBrand,
+            successContentColor = Resources.appColors.textPrimary
+        ) {
+            state.requestState.DisplayResult(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Resources.appColors.surface),
+                onLoading = {
+                    CircularProgressIndicator(
+                        color = Resources.appColors.iconSecondary
                     )
+                },
+                onError = {
+                    ErrorCard(
+                        modifier = Modifier.fillMaxSize(),
+                        message = state.requestState.getErrorMessage(),
+                        fontSize = FontSize.REGULAR
+                    )
+                },
+                onSuccess = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 24.dp)
+                            .padding(top = 12.dp, bottom = 24.dp)
+                            .verticalScroll(state = rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        ProfileForm(
+                            firstName = state.firstName,
+                            onFirstNameChange = {
+                                action(ProfileAction.OnChangeFirstName(it))
+                            },
+                            firstNameError = !state.profileValidity.isFirstNameValid,
+                            lastName = state.lastName,
+                            onLastNameChange = {
+                                action(ProfileAction.OnChangeLastName(it))
+                            },
+                            lastNameError = !state.profileValidity.isLastNameValid,
+                            email = state.email,
+                            city = state.city,
+                            onCityChange = {
+                                action(ProfileAction.OnChangeCity(it))
+                            },
+                            postalCode = state.postalCode,
+                            onPostalCodeChange = {
+                                action(ProfileAction.OnChangePostalCode(it))
+                            },
+                            address = state.address,
+                            onAddressChange = {
+                                action(ProfileAction.OnChangeAddress(it))
+                            },
+                            phoneNumber = state.phoneNumber,
+                            onPhoneNumberChange = {
+                                action(ProfileAction.OnChangePhoneNumber(it))
+                            },
+                            country = state.country,
+                            onCountryPick = { country ->
+                                action(ProfileAction.OnPickCountry(country))
+                            }
+                        )
 
-                    Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.weight(1f))
 
-                    PrimaryButton(
-                        text = "Update",
-                        modifier = Modifier.fillMaxWidth(),
-                        icon = Resources.Icon.Checkmark
-                    ) { }
+                        PrimaryButton(
+                            text = "Update",
+                            modifier = Modifier.fillMaxWidth(),
+                            icon = Resources.Icon.Checkmark
+                        ) {
+                            action(ProfileAction.OnUpdateCustomerClick)
+                        }
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }
 
@@ -180,6 +204,7 @@ private fun ProfileViewPrev() {
     PreviewTheme {
         ProfileView(
             state = ProfileUiState(),
+            messageBarState = rememberMessageBarState(),
             action = {}
         )
     }

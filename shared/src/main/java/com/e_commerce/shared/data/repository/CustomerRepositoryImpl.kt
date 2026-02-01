@@ -7,12 +7,18 @@ import com.e_commerce.shared.domain.repository.CustomerRepository
 import com.e_commerce.shared.domain.resourceManager.ResourceManager
 import com.e_commerce.shared.utils.RequestState
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
+import okio.IOException
+import java.net.ConnectException
+import java.net.UnknownHostException
+import java.nio.channels.UnresolvedAddressException
+import javax.net.ssl.SSLHandshakeException
 
 class CustomerRepositoryImpl(
     private val resourceManager: ResourceManager
@@ -46,13 +52,20 @@ class CustomerRepositoryImpl(
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {
+            val message = when (exception) {
+                is UnresolvedAddressException, is UnknownHostException,
+                is ConnectException, is SSLHandshakeException, is FirebaseException,
+                is IOException -> resourceManager.readString(R.string.msg_internet_not_available)
 
-            onError(
-                resourceManager.readString(
+                is IllegalStateException -> resourceManager.readString(R.string.msg_sign_in_canceled)
+
+                else -> resourceManager.readString(
                     R.string.msg_error_creating_a_customer,
                     exception.message.orEmpty()
                 )
-            )
+            }
+
+            onError(message)
         }
     }
 
@@ -72,7 +85,50 @@ class CustomerRepositoryImpl(
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {
-            send(RequestState.Error("Error while reading a Customer information: ${exception.message}"))
+            val message = when (exception) {
+                is UnresolvedAddressException, is UnknownHostException,
+                is ConnectException, is SSLHandshakeException, is FirebaseException,
+                is IOException -> resourceManager.readString(R.string.msg_internet_not_available)
+
+                is IllegalStateException -> resourceManager.readString(R.string.msg_sign_in_canceled)
+
+                else -> "Error while reading a Customer information: ${exception.message}"
+            }
+            send(RequestState.Error(message))
+        }
+    }
+
+    override suspend fun updateCustomer(
+        customer: Customer,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        try {
+            val userId = currentUserId()
+            if (userId != null) {
+                val customerExists = customerCollection.document(userId).get()
+                if (customerExists.exists) {
+                    customerCollection
+                        .document(userId)
+                        .update(customer)
+                    onSuccess()
+                } else
+                    onError("Customer not found")
+
+            } else onError(resourceManager.readString(R.string.msg_user_not_available))
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            val message = when (exception) {
+                is UnresolvedAddressException, is UnknownHostException,
+                is ConnectException, is SSLHandshakeException, is FirebaseException,
+                is IOException -> resourceManager.readString(R.string.msg_internet_not_available)
+
+                is IllegalStateException -> resourceManager.readString(R.string.msg_sign_in_canceled)
+
+                else -> "Error updating a Customer information: ${exception.message}"
+            }
+            onError(message)
         }
     }
 
@@ -83,7 +139,16 @@ class CustomerRepositoryImpl(
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {
-            return RequestState.Error(message = exception.message ?: "Unexpected Error")
+            val message = when (exception) {
+                is UnresolvedAddressException, is UnknownHostException,
+                is ConnectException, is SSLHandshakeException, is FirebaseException,
+                is IOException -> resourceManager.readString(R.string.msg_internet_not_available)
+
+                is IllegalStateException -> resourceManager.readString(R.string.msg_sign_in_canceled)
+
+                else -> exception.message ?: resourceManager.readString(R.string.lbl_unknown)
+            }
+            return RequestState.Error(message)
         }
     }
 }

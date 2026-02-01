@@ -43,6 +43,6 @@ fun DocumentSnapshot.toCustomer() = Customer(
 
 @Serializable
 data class PhoneNumber(
-    val dialCode: Int,
-    val number: String
+    val dialCode: Int?,
+    val number: String?
 )
