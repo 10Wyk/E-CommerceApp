@@ -12,6 +12,7 @@ import com.e_commerce.home.homeGraph
 import com.e_commerce.profile.profile
 import com.e_commerce.shared.domain.repository.CustomerRepository
 import com.e_commerce.shared.presentation.navigation.Screen
+import com.wyk.admin.admin
 import org.koin.compose.koinInject
 
 @Composable
@@ -49,10 +50,16 @@ fun AppNavController(
             },
             navigateToProfile = {
                 navController.navigate(Screen.Profile)
+            },
+            navigateToAdmin = {
+                navController.navigate(Screen.Admin)
             }
         )
         profile {
             navController.popBackStack()
+        }
+        admin {
+
         }
     }
 }

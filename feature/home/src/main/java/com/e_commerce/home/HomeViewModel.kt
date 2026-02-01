@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
 
 class HomeViewModel : ViewModel() {
     private val _eventChannel = Channel<HomeEvent>()
-    val eventState = _eventChannel.receiveAsFlow()
+    val eventFlow = _eventChannel.receiveAsFlow()
 
     private val _state = MutableStateFlow(HomeUiState())
     val state = _state.asStateFlow()
@@ -37,7 +37,12 @@ class HomeViewModel : ViewModel() {
             HomeAction.OnSignOutClick -> signOutClick()
             HomeAction.OnToggleDrawer -> toggleDrawer()
             HomeAction.OnProfileClick -> profileClick()
+            HomeAction.OnAdminClick -> adminClick()
         }
+    }
+
+    private fun adminClick() {
+        _eventChannel.trySend(HomeEvent.NavigateToScreen(Screen.Admin))
     }
 
     private fun profileClick() {

@@ -68,7 +68,8 @@ import rememberMessageBarState
 
 fun NavGraphBuilder.homeGraph(
     navigateToProfile: () -> Unit,
-    navigateToAuth: () -> Unit
+    navigateToAuth: () -> Unit,
+    navigateToAdmin: () -> Unit
 ) {
     composable<Screen.HomeGraph> {
         val viewModel: HomeViewModel = viewModel()
@@ -81,7 +82,7 @@ fun NavGraphBuilder.homeGraph(
             action = viewModel::actionHandler
         )
 
-        viewModel.eventState.collectAsOneTimeEvent { event ->
+        viewModel.eventFlow.collectAsOneTimeEvent { event ->
             when (event) {
                 is HomeEvent.UpdateErrorMessage -> {
                     messageBarState.addError(event.message)
@@ -96,6 +97,7 @@ fun NavGraphBuilder.homeGraph(
                 is HomeEvent.NavigateToScreen -> when (event.screen) {
                     Screen.Auth -> navigateToAuth.invoke()
                     Screen.Profile -> navigateToProfile.invoke()
+                    Screen.Admin -> navigateToAdmin.invoke()
                     else -> {}
                 }
             }
@@ -165,7 +167,9 @@ private fun Home(
             .systemBarsPadding()
     ) {
         CustomNavigationDrawer(
-            onAdminClick = {},
+            onAdminClick = {
+                action(HomeAction.OnAdminClick)
+            },
             onContactClick = {},
             onProfileClick = {
                 action(HomeAction.OnProfileClick)
@@ -289,10 +293,10 @@ private fun Home(
                             }
                         )
                     }
-                ) { innerPadding ->
+                ) { contentPadding ->
                     NavHost(
                         modifier = Modifier
-                            .padding(innerPadding)
+                            .padding(contentPadding)
                             .fillMaxSize()
                             .background(color = Resources.appColors.surface),
                         navController = navController,
