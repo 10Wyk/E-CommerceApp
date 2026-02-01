@@ -156,8 +156,6 @@ class ProfileViewModel(
                                 customer = customerData.getSuccessData()
                             )
                         }
-
-                        _eventChannel.trySend(ProfileEvent.UpdateSuccessMessage("Fetched customer data successfully"))
                     } else if (customerData.isError()) {
                         _state.update { state ->
                             state.copy(
