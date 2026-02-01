@@ -191,6 +191,12 @@ private fun Home(
                     detectTapGestures(
                         onTap = {
                             if (state.drawerState.isOpened()) action(HomeAction.OnToggleDrawer)
+                        },
+                        onPress = {
+                            if (state.drawerState.isOpened()) action(HomeAction.OnToggleDrawer)
+                        },
+                        onLongPress = {
+                            if (state.drawerState.isOpened()) action(HomeAction.OnToggleDrawer)
                         }
                     )
                 }
