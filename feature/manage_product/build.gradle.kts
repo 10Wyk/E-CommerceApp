@@ -56,5 +56,6 @@ dependencies {
     implementation(libs.auth.kmp)
     implementation(libs.auth.firebase.kmp)
     runtimeOnly(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.bundles.coil)
     implementation(project(":shared"))
 }

@@ -1,15 +1,21 @@
 package com.e_commerce.manage_product
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.e_commerce.manage_product.model.ManageProductAction
 import com.e_commerce.manage_product.model.ManageProductEvent
 import com.e_commerce.manage_product.model.ManageProductUiState
+import com.e_commerce.shared.di.DiHelper
+import com.e_commerce.shared.domain.model.Product
 import com.e_commerce.shared.domain.model.ProductCategory
+import com.e_commerce.shared.domain.repository.ProductRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 class ManageProductViewModel(
     private val id: String?
@@ -20,6 +26,10 @@ class ManageProductViewModel(
     private val _eventChannel = Channel<ManageProductEvent>()
     val eventFlow = _eventChannel.receiveAsFlow()
 
+    private val diComponent = object {
+        val productRepository = DiHelper.get<ProductRepository>()
+    }
+
     fun actionHandler(action: ManageProductAction) {
         when (action) {
             is ManageProductAction.OnChangeDescription -> onChangeDescription(action.description)
@@ -29,7 +39,7 @@ class ManageProductViewModel(
             is ManageProductAction.OnChangeWeight -> onChangeWeight(action.weight)
             ManageProductAction.OnSelectImageCLick -> {}
             is ManageProductAction.OnSelectProductCategory -> onSelectProductCategory(action.productCategory)
-            ManageProductAction.OnUpsertButtonClick -> {}
+            ManageProductAction.OnUpsertButtonClick -> upsertUser()
             ManageProductAction.ToggleDiscounted -> toggleDiscounted()
             ManageProductAction.ToggleNew -> toggleNew()
             ManageProductAction.TogglePopular -> togglePopular()
@@ -106,6 +116,38 @@ class ManageProductViewModel(
             state.copy(
                 discounted = !state.discounted
             )
+        }
+    }
+
+    fun upsertUser() {
+        viewModelScope.launch {
+            val state = state.value
+
+            val product = Product(
+                id = id ?: UUID.randomUUID().toString(),
+                title = state.title,
+                description = state.description,
+                flavors = state.flavors?.split(',')?.map { it.trim() },
+                thumbnail = state.imageUrl.orEmpty(),
+                category = state.productCategory.title,
+                price = state.price.toDoubleOrNull() ?: 0.0,
+                weight = state.weight?.toIntOrNull(),
+                isNew = state.new,
+                isPopular = state.popular,
+                isDiscounted = state.discounted
+            )
+
+            if (id == null)
+                diComponent.productRepository.createProduct(
+                    product = product,
+                    onSuccess = {
+                        println("Success product creation")
+                    },
+                    onError = {
+                        println(it)
+                    }
+                )
+
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.e_commerce.manage_product
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -99,6 +101,10 @@ private fun ManageProductView(
             action(ManageProductAction.OnSelectProductCategory(it))
         }
     )
+
+    rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri ->
+
+    }
 
     Scaffold(
         modifier = Modifier

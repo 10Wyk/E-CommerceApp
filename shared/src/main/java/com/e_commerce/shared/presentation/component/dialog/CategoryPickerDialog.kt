@@ -21,6 +21,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -84,9 +85,14 @@ fun CategoryPickerDialog(
                                 .fillMaxWidth()
                                 .clip(shape = RoundedCornerShape(6.dp))
                                 .background(backgroundColor)
-                                .clickable {
-                                    pickedCategory = product
-                                }
+                                .clickable(
+                                    enabled = true,
+                                    onClick = {
+                                        pickedCategory = product
+                                    },
+                                    interactionSource = null,
+                                    indication = ripple(bounded = true)
+                                )
                                 .padding(vertical = 16.dp, horizontal = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
