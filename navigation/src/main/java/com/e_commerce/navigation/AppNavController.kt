@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.e_commerce.auth.auth
 import com.e_commerce.home.homeGraph
+import com.e_commerce.manage_product.manageProduct
 import com.e_commerce.profile.profile
 import com.e_commerce.shared.domain.repository.CustomerRepository
 import com.e_commerce.shared.presentation.navigation.Screen
@@ -58,7 +59,16 @@ fun AppNavController(
         profile {
             navController.popBackStack()
         }
-        admin {
+        admin(
+            navigateBack = {
+                navController.popBackStack()
+            },
+            navigateToManageProduct = { id ->
+                navController.navigate(Screen.ManageProduct(id = id))
+            }
+        )
+
+        manageProduct {
 
         }
     }

@@ -18,7 +18,16 @@ class AdminViewModel : ViewModel() {
 
     fun actionHandler(action: AdminAction) {
         when (action) {
-            else -> {}
+            AdminAction.OnNavigateBackClick -> navigateBackClick()
+            is AdminAction.OnNavigateToManageProductClick -> onNavigateToManageProductClick(action.id)
         }
+    }
+
+    private fun navigateBackClick() {
+        _channelEvent.trySend(AdminEvent.NavigateBack)
+    }
+
+    private fun onNavigateToManageProductClick(id: String?) {
+        _channelEvent.trySend(AdminEvent.NavigateToManageProduct(id))
     }
 }

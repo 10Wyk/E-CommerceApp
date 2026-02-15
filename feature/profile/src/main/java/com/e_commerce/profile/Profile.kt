@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -146,7 +147,8 @@ private fun ProfileView(
                             .fillMaxSize()
                             .padding(horizontal = 24.dp)
                             .padding(top = 12.dp, bottom = 24.dp)
-                            .verticalScroll(state = rememberScrollState()),
+                            .verticalScroll(state = rememberScrollState())
+                            .imePadding(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         ProfileForm(

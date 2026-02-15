@@ -1,0 +1,3 @@
+package com.e_commerce.manage_product.model
+
+sealed interface ManageProductEvent

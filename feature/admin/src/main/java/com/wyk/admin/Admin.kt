@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -28,11 +30,12 @@ import com.e_commerce.shared.presentation.Resources
 import com.e_commerce.shared.presentation.navigation.Screen
 import com.e_commerce.shared.utils.collectAsOneTimeEvent
 import com.wyk.admin.model.AdminAction
+import com.wyk.admin.model.AdminEvent
 import com.wyk.admin.model.AdminUiState
 
-
 fun NavGraphBuilder.admin(
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    navigateToManageProduct: (String?) -> Unit
 ) {
     composable<Screen.Admin> {
         val viewModel: AdminViewModel = viewModel()
@@ -45,7 +48,8 @@ fun NavGraphBuilder.admin(
 
         viewModel.eventFlow.collectAsOneTimeEvent { event ->
             when (event) {
-                else -> {}
+                AdminEvent.NavigateBack -> navigateBack()
+                is AdminEvent.NavigateToManageProduct -> navigateToManageProduct(event.id)
             }
         }
     }
@@ -79,6 +83,7 @@ private fun Admin(
                 navigationIcon = {
                     IconButton(
                         onClick = {
+                            action(AdminAction.OnNavigateBackClick)
                         },
                     ) {
                         Icon(
@@ -103,7 +108,9 @@ private fun Admin(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {},
+                onClick = {
+                    action(AdminAction.OnNavigateToManageProductClick(id = null))
+                },
                 containerColor = Resources.appColors.buttonPrimary,
                 contentColor = Resources.appColors.iconPrimary
             ) {
@@ -121,7 +128,13 @@ private fun Admin(
                 .fillMaxSize()
                 .background(color = Resources.appColors.surface)
         ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(state.product) {
 
+                }
+            }
         }
     }
 }

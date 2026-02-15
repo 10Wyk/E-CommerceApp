@@ -23,4 +23,9 @@ sealed interface Screen {
 
     @Serializable
     data object Admin : Screen
+
+    @Serializable
+    data class ManageProduct(
+        val id: String? = null
+    ) : Screen
 }

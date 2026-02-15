@@ -80,3 +80,4 @@ google-services = { id = "com.google.gms.google-services", version.ref = "google
 [bundles]
 koin = ["koin-core", "koin-compose", "koin-android", "koin-androidx-compose", "koin-compose-viewmodel", "koin-test", "koin-test-junit4"]
 firebase = ["firebase-app", "firebase-firestore", "firebase-storage", "firebase-common"]
+coil = ["coil-compose", "coil-network-okHttp"]
