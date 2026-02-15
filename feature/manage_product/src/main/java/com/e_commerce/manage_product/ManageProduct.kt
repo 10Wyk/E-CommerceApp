@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -45,6 +46,7 @@ import com.e_commerce.shared.presentation.BebasNeueRegularFont
 import com.e_commerce.shared.presentation.FontSize
 import com.e_commerce.shared.presentation.PreviewTheme
 import com.e_commerce.shared.presentation.Resources
+import com.e_commerce.shared.presentation.component.button.PrimaryButton
 import com.e_commerce.shared.presentation.component.textfield.AlertTextField
 import com.e_commerce.shared.presentation.component.textfield.CustomTextField
 import com.e_commerce.shared.presentation.navigation.Screen
@@ -121,12 +123,14 @@ private fun ManageProductView(
                 .padding(contentPadding)
                 .fillMaxSize()
                 .background(color = Resources.appColors.surface)
-                .padding(vertical = 12.dp, horizontal = 24.dp)
+                .padding(horizontal = 24.dp)
+                .imePadding()
         ) {
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Button(
@@ -307,6 +311,18 @@ private fun ManageProductView(
                     )
                 }
             }
+
+            val buttonText = if (update) "Update" else "Add new product"
+            val icon = if (update) Resources.Icon.Checkmark else Resources.Icon.Plus
+
+            PrimaryButton(
+                modifier = Modifier
+                    .padding(vertical = 24.dp)
+                    .fillMaxWidth(),
+                onClick = {},
+                text = buttonText,
+                icon = icon
+            )
         }
     }
 }
