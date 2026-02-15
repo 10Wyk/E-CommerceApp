@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.e_commerce.manage_product.model.ManageProductAction
 import com.e_commerce.manage_product.model.ManageProductEvent
 import com.e_commerce.manage_product.model.ManageProductUiState
+import com.e_commerce.shared.domain.model.ProductCategory
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,12 +28,20 @@ class ManageProductViewModel(
             is ManageProductAction.OnChangeTitle -> onChangeTitle(action.title)
             is ManageProductAction.OnChangeWeight -> onChangeWeight(action.weight)
             ManageProductAction.OnSelectImageCLick -> {}
-            is ManageProductAction.OnSelectProductCategory -> {}
+            is ManageProductAction.OnSelectProductCategory -> onSelectProductCategory(action.productCategory)
             ManageProductAction.OnUpsertButtonClick -> {}
             ManageProductAction.ToggleDiscounted -> toggleDiscounted()
             ManageProductAction.ToggleNew -> toggleNew()
             ManageProductAction.TogglePopular -> togglePopular()
             ManageProductAction.OnNavigateBackClick -> {}
+        }
+    }
+
+    private fun onSelectProductCategory(productCategory: ProductCategory) {
+        _state.update { state ->
+            state.copy(
+                productCategory = productCategory
+            )
         }
     }
 

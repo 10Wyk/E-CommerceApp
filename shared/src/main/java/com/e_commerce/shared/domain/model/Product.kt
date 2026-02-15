@@ -1,6 +1,10 @@
 package com.e_commerce.shared.domain.model
 
 import androidx.compose.ui.graphics.Color
+import com.e_commerce.shared.presentation.CategoryBlue
+import com.e_commerce.shared.presentation.CategoryGreen
+import com.e_commerce.shared.presentation.CategoryPurple
+import com.e_commerce.shared.presentation.CategoryRed
 import com.e_commerce.shared.presentation.CategoryYellow
 import kotlinx.serialization.Serializable
 
@@ -29,18 +33,18 @@ enum class ProductCategory(
     ),
     Creatine(
         title = "Creatine",
-        color = CategoryYellow
+        color = CategoryBlue
     ),
     PreWorkout(
         title = "Pre-Workout",
-        color = CategoryYellow
+        color = CategoryPurple
     ),
     Gainers(
         title = "Gainers",
-        color = CategoryYellow
+        color = CategoryRed
     ),
     Accessories(
         title = "Accessories",
-        color = CategoryYellow
+        color = CategoryGreen
     )
 }

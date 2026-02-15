@@ -29,6 +29,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +51,7 @@ import com.e_commerce.shared.presentation.FontSize
 import com.e_commerce.shared.presentation.PreviewTheme
 import com.e_commerce.shared.presentation.Resources
 import com.e_commerce.shared.presentation.component.button.PrimaryButton
+import com.e_commerce.shared.presentation.component.dialog.CategoryPickerDialog
 import com.e_commerce.shared.presentation.component.textfield.AlertTextField
 import com.e_commerce.shared.presentation.component.textfield.CustomTextField
 import com.e_commerce.shared.presentation.navigation.Screen
@@ -82,6 +87,18 @@ private fun ManageProductView(
     action: (ManageProductAction) -> Unit
 ) {
     val title = if (update) "edit product" else "new product"
+
+    var dialogVisibility by remember { mutableStateOf(false) }
+
+    if (dialogVisibility) CategoryPickerDialog(
+        selectedCategory = state.productCategory,
+        onDismiss = {
+            dialogVisibility = false
+        },
+        onConfirmClick = {
+            action(ManageProductAction.OnSelectProductCategory(it))
+        }
+    )
 
     Scaffold(
         modifier = Modifier
@@ -130,7 +147,7 @@ private fun ManageProductView(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .padding(top = 12.dp),
+                    .padding(top = 12.dp, bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Button(
@@ -177,7 +194,9 @@ private fun ManageProductView(
                 AlertTextField(
                     modifier = Modifier.fillMaxWidth(),
                     text = state.productCategory.title,
-                    onClick = {}
+                    onClick = {
+                        dialogVisibility = true
+                    }
                 )
 
                 CustomTextField(
@@ -317,9 +336,11 @@ private fun ManageProductView(
 
             PrimaryButton(
                 modifier = Modifier
-                    .padding(vertical = 24.dp)
+                    .padding(bottom = 24.dp)
                     .fillMaxWidth(),
-                onClick = {},
+                onClick = {
+                    action(ManageProductAction.OnUpsertButtonClick)
+                },
                 text = buttonText,
                 icon = icon
             )
