@@ -1,7 +1,8 @@
-package com.e_commerce.shared.utils
+package com.e_commerce.shared.presentation.utils
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -40,22 +41,17 @@ fun <T> RequestState<T>.DisplayResult(
     onLoading: (@Composable () -> Unit)? = null,
     onError: (@Composable (String) -> Unit)? = null,
     onSuccess: @Composable (T) -> Unit,
-    transitionSpec: ContentTransform? = scaleIn(tween(durationMillis = 400))
-            + fadeIn(tween(durationMillis = 800))
-            togetherWith scaleOut(tween(durationMillis = 400))
-            + fadeOut(
-        tween(durationMillis = 800)
-    ),
+    enter: EnterTransition = scaleIn(tween(durationMillis = 400))
+            + fadeIn(tween(durationMillis = 800)),
+    exit: ExitTransition = scaleOut(tween(durationMillis = 400))
+            + fadeOut(tween(durationMillis = 800)),
     backgroundColor: Color? = null
 ) {
     AnimatedContent(
         modifier = modifier
             .background(color = backgroundColor ?: Color.Unspecified),
         targetState = this,
-        transitionSpec = {
-            fadeIn(animationSpec = tween(220, delayMillis = 90))
-                .togetherWith(fadeOut(animationSpec = tween(90)))
-        },
+        transitionSpec = { enter togetherWith exit },
         label = "Content Animation"
     ) { state ->
         Row(

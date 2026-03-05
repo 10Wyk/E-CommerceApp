@@ -10,7 +10,7 @@ import com.e_commerce.shared.di.DiHelper
 import com.e_commerce.shared.domain.model.Country
 import com.e_commerce.shared.domain.model.PhoneNumber
 import com.e_commerce.shared.domain.repository.CustomerRepository
-import com.e_commerce.shared.utils.RequestState
+import com.e_commerce.shared.presentation.utils.RequestState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

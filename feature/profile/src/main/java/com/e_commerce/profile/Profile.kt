@@ -42,7 +42,7 @@ import com.e_commerce.shared.presentation.component.InfoCard
 import com.e_commerce.shared.presentation.component.ProfileForm
 import com.e_commerce.shared.presentation.component.button.PrimaryButton
 import com.e_commerce.shared.presentation.navigation.Screen
-import com.e_commerce.shared.utils.DisplayResult
+import com.e_commerce.shared.presentation.utils.DisplayResult
 import com.e_commerce.shared.utils.collectAsOneTimeEvent
 import rememberMessageBarState
 

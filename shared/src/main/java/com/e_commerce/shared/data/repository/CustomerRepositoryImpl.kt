@@ -5,7 +5,7 @@ import com.e_commerce.shared.domain.model.Customer
 import com.e_commerce.shared.domain.model.toCustomer
 import com.e_commerce.shared.domain.repository.CustomerRepository
 import com.e_commerce.shared.domain.resourceManager.ResourceManager
-import com.e_commerce.shared.utils.RequestState
+import com.e_commerce.shared.presentation.utils.RequestState
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.auth.auth

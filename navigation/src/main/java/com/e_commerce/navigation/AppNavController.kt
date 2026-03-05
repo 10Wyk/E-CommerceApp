@@ -69,7 +69,7 @@ fun AppNavController(
         )
 
         manageProduct {
-
+            navController.popBackStack()
         }
     }
 }

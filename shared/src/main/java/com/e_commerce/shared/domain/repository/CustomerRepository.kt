@@ -1,7 +1,7 @@
 package com.e_commerce.shared.domain.repository
 
 import com.e_commerce.shared.domain.model.Customer
-import com.e_commerce.shared.utils.RequestState
+import com.e_commerce.shared.presentation.utils.RequestState
 import kotlinx.coroutines.flow.Flow
 
 interface CustomerRepository {

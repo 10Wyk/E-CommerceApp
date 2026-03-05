@@ -9,11 +9,14 @@ import com.e_commerce.shared.di.DiHelper
 import com.e_commerce.shared.domain.model.Product
 import com.e_commerce.shared.domain.model.ProductCategory
 import com.e_commerce.shared.domain.repository.ProductRepository
+import com.e_commerce.shared.presentation.utils.RequestState
+import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -37,14 +40,22 @@ class ManageProductViewModel(
             is ManageProductAction.OnChangePrice -> onChangePrice(action.price)
             is ManageProductAction.OnChangeTitle -> onChangeTitle(action.title)
             is ManageProductAction.OnChangeWeight -> onChangeWeight(action.weight)
-            ManageProductAction.OnSelectImageCLick -> {}
             is ManageProductAction.OnSelectProductCategory -> onSelectProductCategory(action.productCategory)
-            ManageProductAction.OnUpsertButtonClick -> upsertUser()
+            ManageProductAction.OnUpsertButtonClick -> upsertProduct()
             ManageProductAction.ToggleDiscounted -> toggleDiscounted()
             ManageProductAction.ToggleNew -> toggleNew()
             ManageProductAction.TogglePopular -> togglePopular()
-            ManageProductAction.OnNavigateBackClick -> {}
+            ManageProductAction.OnNavigateBackClick -> navigateBackClick()
+            is ManageProductAction.OnSelectImage -> selectImage(action.image)
         }
+    }
+
+    private fun navigateBackClick() {
+        _eventChannel.trySend(ManageProductEvent.NavigateBack)
+    }
+
+    private fun selectImage(image: File?) {
+
     }
 
     private fun onSelectProductCategory(productCategory: ProductCategory) {
@@ -119,9 +130,13 @@ class ManageProductViewModel(
         }
     }
 
-    fun upsertUser() {
+    fun upsertProduct() {
         viewModelScope.launch {
-            val state = state.value
+            val state = _state.updateAndGet { state ->
+                state.copy(
+                    requestState = RequestState.Loading
+                )
+            }
 
             val product = Product(
                 id = id ?: UUID.randomUUID().toString(),
@@ -141,10 +156,20 @@ class ManageProductViewModel(
                 diComponent.productRepository.createProduct(
                     product = product,
                     onSuccess = {
-                        println("Success product creation")
+                        _state.update { state ->
+                            state.copy(
+                                requestState = RequestState.Success(Unit)
+                            )
+                        }
+                        _eventChannel.trySend(ManageProductEvent.UpdateSuccessMessage("Product added"))
                     },
                     onError = {
-                        println(it)
+                        _state.update { state ->
+                            state.copy(
+                                requestState = RequestState.Error(it)
+                            )
+                        }
+                        _eventChannel.trySend(ManageProductEvent.UpdateSuccessMessage(it))
                     }
                 )
 

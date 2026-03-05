@@ -30,7 +30,7 @@ class ProductRepositoryImpl(
             if (userId != null) {
                 customerCollection.document(product.id)
                     .set(product)
-
+                onSuccess()
             } else onError(resourceManager.readString(R.string.msg_user_not_available))
         } catch (e: Exception) {
             onError(e.message.orEmpty())

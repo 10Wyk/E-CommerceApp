@@ -2,7 +2,7 @@ package com.e_commerce.profile.model
 
 import com.e_commerce.shared.domain.model.Country
 import com.e_commerce.shared.domain.model.Customer
-import com.e_commerce.shared.utils.RequestState
+import com.e_commerce.shared.presentation.utils.RequestState
 
 data class ProfileUiState(
     val customer: Customer? = null,

@@ -1,7 +1,12 @@
 package com.e_commerce.manage_product
 
+import ContentWithMessageBar
+import MessageBarState
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,17 +53,22 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.e_commerce.manage_product.model.ManageProductAction
+import com.e_commerce.manage_product.model.ManageProductEvent
 import com.e_commerce.manage_product.model.ManageProductUiState
 import com.e_commerce.shared.presentation.BebasNeueRegularFont
 import com.e_commerce.shared.presentation.FontSize
 import com.e_commerce.shared.presentation.PreviewTheme
 import com.e_commerce.shared.presentation.Resources
+import com.e_commerce.shared.presentation.component.InfoCard
 import com.e_commerce.shared.presentation.component.button.PrimaryButton
 import com.e_commerce.shared.presentation.component.dialog.CategoryPickerDialog
 import com.e_commerce.shared.presentation.component.textfield.AlertTextField
 import com.e_commerce.shared.presentation.component.textfield.CustomTextField
 import com.e_commerce.shared.presentation.navigation.Screen
+import com.e_commerce.shared.presentation.utils.DisplayResult
 import com.e_commerce.shared.utils.collectAsOneTimeEvent
+import dev.gitlive.firebase.storage.File
+import rememberMessageBarState
 
 fun NavGraphBuilder.manageProduct(
     navigateBack: () -> Unit
@@ -68,15 +79,26 @@ fun NavGraphBuilder.manageProduct(
     }
     val state = viewModel.state.collectAsStateWithLifecycle().value
 
+    val messageBarState = rememberMessageBarState()
+
     ManageProductView(
         state = state,
         update = id != null,
-        action = viewModel::actionHandler
+        action = viewModel::actionHandler,
+        messageBarState = messageBarState
     )
 
     viewModel.eventFlow.collectAsOneTimeEvent { event ->
         when (event) {
-            else -> {}
+            is ManageProductEvent.UpdateErrorMessage -> {
+                messageBarState.addError(event.message)
+            }
+
+            is ManageProductEvent.UpdateSuccessMessage -> {
+                messageBarState.addSuccess(event.message)
+            }
+
+            ManageProductEvent.NavigateBack -> navigateBack
         }
     }
 }
@@ -86,6 +108,7 @@ fun NavGraphBuilder.manageProduct(
 private fun ManageProductView(
     state: ManageProductUiState,
     update: Boolean,
+    messageBarState: MessageBarState,
     action: (ManageProductAction) -> Unit
 ) {
     val title = if (update) "edit product" else "new product"
@@ -102,9 +125,13 @@ private fun ManageProductView(
         }
     )
 
-    rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri ->
-
+    //@formatter:off
+    val imagePicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri ->
+            uri?.let { action(ManageProductAction.OnSelectImage(File(uri))) } ?: action(
+                ManageProductAction.OnSelectImage(null)
+            )
     }
+    //@formatter:on
 
     Scaffold(
         modifier = Modifier
@@ -141,214 +168,253 @@ private fun ManageProductView(
             )
         }
     ) { contentPadding ->
-        Column(
+
+        ContentWithMessageBar(
             modifier = Modifier
                 .padding(contentPadding)
-                .fillMaxSize()
-                .background(color = Resources.appColors.surface)
-                .padding(horizontal = 24.dp)
-                .imePadding()
+                .fillMaxSize(),
+            messageBarState = messageBarState,
+            errorMaxLines = 2,
+            errorContainerColor = Resources.appColors.surfaceError,
+            errorContentColor = Resources.appColors.textWhite,
+            successContainerColor = Resources.appColors.surfaceBrand,
+            successContentColor = Resources.appColors.textPrimary
         ) {
-            Column(
+            state.requestState.DisplayResult(
+                enter = fadeIn(),
+                exit = fadeOut(),
                 modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(top = 12.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Resources.appColors.surfaceLighter,
-                        contentColor = Resources.appColors.textPrimary
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(width = 1.dp, color = Resources.appColors.surfaceDarker),
-                    onClick = {}
-                ) {
-                    Icon(
-                        painter = painterResource(Resources.Icon.Plus),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = Resources.appColors.iconPrimary
+                    .fillMaxSize()
+                    .background(color = Resources.appColors.surface),
+                onLoading = {
+                    CircularProgressIndicator(
+                        color = Resources.appColors.iconSecondary
                     )
-                }
-
-                CustomTextField(
-                    value = state.title,
-                    placeholder = "Title",
-                    onValueChange = {
-                        action(ManageProductAction.OnChangeTitle(it))
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                CustomTextField(
-                    value = state.description,
-                    singleLine = false,
-                    placeholder = "Description",
-                    onValueChange = {
-                        action(ManageProductAction.OnChangeDescription(it))
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(168.dp)
-                )
-
-                AlertTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = state.productCategory.title,
-                    onClick = {
-                        dialogVisibility = true
-                    }
-                )
-
-                CustomTextField(
-                    value = state.weight.orEmpty(),
-                    singleLine = false,
-                    placeholder = "Weight",
-                    onValueChange = {
-                        action(ManageProductAction.OnChangeWeight(it))
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                CustomTextField(
-                    value = state.flavors.orEmpty(),
-                    singleLine = false,
-                    placeholder = "Flavors",
-                    onValueChange = {
-                        action(ManageProductAction.OnChangeFlavors(it))
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-
-                CustomTextField(
-                    value = state.price,
-                    singleLine = false,
-                    placeholder = "Price",
-                    onValueChange = {
-                        action(ManageProductAction.OnChangePrice(it))
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "New",
-                        fontSize = FontSize.REGULAR,
-                        color = Resources.appColors.textPrimary
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Switch(
-                        modifier = Modifier
-                            .height(32.dp)
-                            .width(52.dp),
-                        checked = state.new,
-                        onCheckedChange = {
-                            action(ManageProductAction.ToggleNew)
-                        },
-                        colors = SwitchDefaults.colors(
-                            checkedTrackColor = Resources.appColors.surfaceSecondary,
-                            checkedThumbColor = Resources.appColors.surface,
-                            uncheckedThumbColor = Resources.appColors.surface,
-                            uncheckedTrackColor = Resources.appColors.surfaceDarker,
-                            checkedBorderColor = Color.Transparent,
-                            uncheckedBorderColor = Color.Transparent
-                        )
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "Popular",
-                        fontSize = FontSize.REGULAR,
-                        color = Resources.appColors.textPrimary
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Switch(
-                        modifier = Modifier
-                            .height(32.dp)
-                            .width(52.dp),
-                        checked = state.popular,
-                        onCheckedChange = {
-                            action(ManageProductAction.TogglePopular)
-                        },
-                        colors = SwitchDefaults.colors(
-                            checkedTrackColor = Resources.appColors.surfaceSecondary,
-                            checkedThumbColor = Resources.appColors.surface,
-                            uncheckedThumbColor = Resources.appColors.surface,
-                            uncheckedTrackColor = Resources.appColors.surfaceDarker,
-                            checkedBorderColor = Color.Transparent,
-                            uncheckedBorderColor = Color.Transparent
-                        )
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "Discounted",
-                        fontSize = FontSize.REGULAR,
-                        color = Resources.appColors.textPrimary
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Switch(
-                        modifier = Modifier
-                            .height(32.dp)
-                            .width(52.dp),
-                        checked = state.discounted,
-                        onCheckedChange = {
-                            action(ManageProductAction.ToggleDiscounted)
-                        },
-                        colors = SwitchDefaults.colors(
-                            checkedTrackColor = Resources.appColors.surfaceSecondary,
-                            checkedThumbColor = Resources.appColors.surface,
-                            uncheckedThumbColor = Resources.appColors.surface,
-                            uncheckedTrackColor = Resources.appColors.surfaceDarker,
-                            checkedBorderColor = Color.Transparent,
-                            uncheckedBorderColor = Color.Transparent
-                        )
-                    )
-                }
-            }
-
-            val buttonText = if (update) "Update" else "Add new product"
-            val icon = if (update) Resources.Icon.Checkmark else Resources.Icon.Plus
-
-            PrimaryButton(
-                modifier = Modifier
-                    .padding(bottom = 24.dp)
-                    .fillMaxWidth(),
-                onClick = {
-                    action(ManageProductAction.OnUpsertButtonClick)
                 },
-                text = buttonText,
-                icon = icon
+                onError = {
+                    InfoCard(
+                        modifier = Modifier.fillMaxSize(),
+                        title = "Oops!",
+                        subTitle = state.requestState.getErrorMessage(),
+                        image = Resources.Image.Cat
+                    )
+                },
+                onSuccess = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Resources.appColors.surface)
+                            .padding(horizontal = 24.dp)
+                            .imePadding()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState())
+                                .padding(top = 12.dp, bottom = 24.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(300.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Resources.appColors.surfaceLighter,
+                                    contentColor = Resources.appColors.textPrimary
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(
+                                    width = 1.dp,
+                                    color = Resources.appColors.surfaceDarker
+                                ),
+                                onClick = {
+                                    imagePicker.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(Resources.Icon.Plus),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp),
+                                    tint = Resources.appColors.iconPrimary
+                                )
+                            }
+
+                            CustomTextField(
+                                value = state.title,
+                                placeholder = "Title",
+                                onValueChange = {
+                                    action(ManageProductAction.OnChangeTitle(it))
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            CustomTextField(
+                                value = state.description,
+                                singleLine = false,
+                                placeholder = "Description",
+                                onValueChange = {
+                                    action(ManageProductAction.OnChangeDescription(it))
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(168.dp)
+                            )
+
+                            AlertTextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = state.productCategory.title,
+                                onClick = {
+                                    dialogVisibility = true
+                                }
+                            )
+
+                            CustomTextField(
+                                value = state.weight.orEmpty(),
+                                singleLine = false,
+                                placeholder = "Weight",
+                                onValueChange = {
+                                    action(ManageProductAction.OnChangeWeight(it))
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            CustomTextField(
+                                value = state.flavors.orEmpty(),
+                                singleLine = false,
+                                placeholder = "Flavors",
+                                onValueChange = {
+                                    action(ManageProductAction.OnChangeFlavors(it))
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            )
+
+                            CustomTextField(
+                                value = state.price,
+                                singleLine = false,
+                                placeholder = "Price",
+                                onValueChange = {
+                                    action(ManageProductAction.OnChangePrice(it))
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = "New",
+                                    fontSize = FontSize.REGULAR,
+                                    color = Resources.appColors.textPrimary
+                                )
+
+                                Spacer(modifier = Modifier.weight(1f))
+
+                                Switch(
+                                    modifier = Modifier
+                                        .height(32.dp)
+                                        .width(52.dp),
+                                    checked = state.new,
+                                    onCheckedChange = {
+                                        action(ManageProductAction.ToggleNew)
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        checkedTrackColor = Resources.appColors.surfaceSecondary,
+                                        checkedThumbColor = Resources.appColors.surface,
+                                        uncheckedThumbColor = Resources.appColors.surface,
+                                        uncheckedTrackColor = Resources.appColors.surfaceDarker,
+                                        checkedBorderColor = Color.Transparent,
+                                        uncheckedBorderColor = Color.Transparent
+                                    )
+                                )
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = "Popular",
+                                    fontSize = FontSize.REGULAR,
+                                    color = Resources.appColors.textPrimary
+                                )
+
+                                Spacer(modifier = Modifier.weight(1f))
+
+                                Switch(
+                                    modifier = Modifier
+                                        .height(32.dp)
+                                        .width(52.dp),
+                                    checked = state.popular,
+                                    onCheckedChange = {
+                                        action(ManageProductAction.TogglePopular)
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        checkedTrackColor = Resources.appColors.surfaceSecondary,
+                                        checkedThumbColor = Resources.appColors.surface,
+                                        uncheckedThumbColor = Resources.appColors.surface,
+                                        uncheckedTrackColor = Resources.appColors.surfaceDarker,
+                                        checkedBorderColor = Color.Transparent,
+                                        uncheckedBorderColor = Color.Transparent
+                                    )
+                                )
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = "Discounted",
+                                    fontSize = FontSize.REGULAR,
+                                    color = Resources.appColors.textPrimary
+                                )
+
+                                Spacer(modifier = Modifier.weight(1f))
+
+                                Switch(
+                                    modifier = Modifier
+                                        .height(32.dp)
+                                        .width(52.dp),
+                                    checked = state.discounted,
+                                    onCheckedChange = {
+                                        action(ManageProductAction.ToggleDiscounted)
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        checkedTrackColor = Resources.appColors.surfaceSecondary,
+                                        checkedThumbColor = Resources.appColors.surface,
+                                        uncheckedThumbColor = Resources.appColors.surface,
+                                        uncheckedTrackColor = Resources.appColors.surfaceDarker,
+                                        checkedBorderColor = Color.Transparent,
+                                        uncheckedBorderColor = Color.Transparent
+                                    )
+                                )
+                            }
+                        }
+
+                        val buttonText = if (update) "Update" else "Add new product"
+                        val icon = if (update) Resources.Icon.Checkmark else Resources.Icon.Plus
+
+                        PrimaryButton(
+                            modifier = Modifier
+                                .padding(bottom = 24.dp)
+                                .fillMaxWidth(),
+                            onClick = {
+                                action(ManageProductAction.OnUpsertButtonClick)
+                            },
+                            text = buttonText,
+                            icon = icon
+                        )
+                    }
+                }
             )
         }
     }
@@ -361,7 +427,8 @@ private fun ManageProductViewPrev() {
         ManageProductView(
             state = ManageProductUiState(),
             update = false,
-            action = {}
+            action = {},
+            messageBarState = rememberMessageBarState()
         )
     }
 }
