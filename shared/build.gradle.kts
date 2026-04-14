@@ -52,4 +52,5 @@ dependencies {
     implementation(libs.kotlinx.serialization)
     implementation(libs.auth.firebase.kmp)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
 }

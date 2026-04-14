@@ -1,5 +1,6 @@
 package com.e_commerce.manage_product
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.e_commerce.manage_product.model.ManageProductAction
@@ -9,6 +10,7 @@ import com.e_commerce.shared.di.DiHelper
 import com.e_commerce.shared.domain.model.Product
 import com.e_commerce.shared.domain.model.ProductCategory
 import com.e_commerce.shared.domain.repository.ProductRepository
+import com.e_commerce.shared.presentation.utils.ImageState
 import com.e_commerce.shared.presentation.utils.RequestState
 import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.channels.Channel
@@ -54,8 +56,38 @@ class ManageProductViewModel(
         _eventChannel.trySend(ManageProductEvent.NavigateBack)
     }
 
-    private fun selectImage(image: File?) {
+    private fun selectImage(image: String?) {
+        viewModelScope.launch {
+            if (image == null) {
+                _eventChannel.trySend(ManageProductEvent.UpdateErrorMessage("No image picked"))
+                return@launch
+            }
 
+            _state.update { state ->
+                state.copy(
+                    imageState = ImageState.Loading
+                )
+            }
+
+            diComponent.productRepository.addImage(
+                file = File(image.toUri()),
+                onSuccess = { url ->
+                    _state.update { state ->
+                        state.copy(
+                            imageState = ImageState.Success(url)
+                        )
+                    }
+                },
+                onError = { message ->
+                    _eventChannel.trySend(ManageProductEvent.UpdateErrorMessage(message))
+                    _state.update { state ->
+                        state.copy(
+                            imageState = ImageState.Error
+                        )
+                    }
+                }
+            )
+        }
     }
 
     private fun onSelectProductCategory(productCategory: ProductCategory) {
@@ -138,12 +170,15 @@ class ManageProductViewModel(
                 )
             }
 
+            val imageUrl: String? =
+                if (state.imageState is ImageState.Success) state.imageState.imageUrl else null
+
             val product = Product(
                 id = id ?: UUID.randomUUID().toString(),
                 title = state.title,
                 description = state.description,
                 flavors = state.flavors?.split(',')?.map { it.trim() },
-                thumbnail = state.imageUrl.orEmpty(),
+                thumbnail = imageUrl.orEmpty(),
                 category = state.productCategory.title,
                 price = state.price.toDoubleOrNull() ?: 0.0,
                 weight = state.weight?.toIntOrNull(),
