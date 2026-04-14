@@ -10,6 +10,7 @@ sealed interface ManageProductAction {
     data class OnChangeFlavors(val flavors: String) : ManageProductAction
     data class OnChangePrice(val price: String) : ManageProductAction
     data class OnSelectImage(val image: String?) : ManageProductAction
+    data class OnDeleteImage(val url: String) : ManageProductAction
     data object ToggleNew : ManageProductAction
     data object TogglePopular : ManageProductAction
     data object ToggleDiscounted : ManageProductAction

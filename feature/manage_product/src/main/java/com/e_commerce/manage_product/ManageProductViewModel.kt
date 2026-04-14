@@ -49,6 +49,7 @@ class ManageProductViewModel(
             ManageProductAction.TogglePopular -> togglePopular()
             ManageProductAction.OnNavigateBackClick -> navigateBackClick()
             is ManageProductAction.OnSelectImage -> selectImage(action.image)
+            is ManageProductAction.OnDeleteImage -> deleteImage(action.url)
         }
     }
 
@@ -75,6 +76,35 @@ class ManageProductViewModel(
                     _state.update { state ->
                         state.copy(
                             imageState = ImageState.Success(url)
+                        )
+                    }
+                },
+                onError = { message ->
+                    _eventChannel.trySend(ManageProductEvent.UpdateErrorMessage(message))
+                    _state.update { state ->
+                        state.copy(
+                            imageState = ImageState.Error
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    private fun deleteImage(url: String) {
+        viewModelScope.launch {
+            _state.update { state ->
+                state.copy(
+                    imageState = ImageState.Loading
+                )
+            }
+
+            diComponent.productRepository.deleteImage(
+                url = url,
+                onSuccess = {
+                    _state.update { state ->
+                        state.copy(
+                            imageState = ImageState.Idle
                         )
                     }
                 },

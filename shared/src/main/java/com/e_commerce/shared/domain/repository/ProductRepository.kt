@@ -16,4 +16,10 @@ interface ProductRepository {
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     )
+
+    suspend fun deleteImage(
+        url: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    )
 }

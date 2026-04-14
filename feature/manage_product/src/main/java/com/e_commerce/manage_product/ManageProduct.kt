@@ -238,7 +238,7 @@ private fun ManageProductView(
                                             shape = RoundedCornerShape(12.dp),
                                             border = BorderStroke(
                                                 width = 1.dp,
-                                                color = Resources.appColors.surfaceDarker
+                                                color = Resources.appColors.surfaceDarker,
                                             ),
                                             onClick = {
                                                 imagePicker.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
@@ -258,13 +258,14 @@ private fun ManageProductView(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .height(300.dp)
-                                                .background(color = Resources.appColors.surfaceLighter)
                                                 .clip(shape = RoundedCornerShape(12.dp))
+                                                .background(color = Resources.appColors.surfaceLighter)
                                                 .border(
                                                     border = BorderStroke(
                                                         width = 1.dp,
                                                         color = Resources.appColors.surfaceDarker
-                                                    )
+                                                    ),
+                                                    shape = RoundedCornerShape(12.dp)
                                                 ),
                                             contentAlignment = Alignment.Center
                                         ) {
@@ -275,26 +276,57 @@ private fun ManageProductView(
                                     }
 
                                     is ImageState.Success -> {
-                                        SubcomposeAsyncImage(
-                                            model = state.imageUrl,
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(300.dp)
-                                                .clickable(
-                                                    enabled = true,
-                                                    onClick = {
-                                                        imagePicker.launch(
-                                                            PickVisualMediaRequest(
-                                                                mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                                        Box {
+                                            SubcomposeAsyncImage(
+                                                model = state.imageUrl,
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(300.dp)
+                                                    .clip(shape = RoundedCornerShape(12.dp))
+                                                    .clickable(
+                                                        enabled = true,
+                                                        onClick = {
+                                                            imagePicker.launch(
+                                                                PickVisualMediaRequest(
+                                                                    mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                                )
                                                             )
-                                                        )
-                                                    },
-                                                    interactionSource = null,
-                                                    indication = ripple(bounded = true)
-                                                ),
-                                            contentScale = ContentScale.Crop
-                                        )
+                                                        },
+                                                        interactionSource = null,
+                                                        indication = ripple(bounded = true)
+                                                    ),
+                                                contentScale = ContentScale.Crop,
+                                            )
+
+                                            Box(
+                                                modifier = Modifier
+                                                    .align(Alignment.TopEnd)
+                                                    .padding(top = 12.dp, end = 12.dp)
+                                                    .clip(shape = RoundedCornerShape(6.dp))
+                                                    .background(color = Resources.appColors.buttonPrimary)
+                                                    .clickable(
+                                                        interactionSource = null,
+                                                        indication = ripple(bounded = true),
+                                                        onClick = {
+                                                            action(
+                                                                ManageProductAction.OnDeleteImage(
+                                                                    state.imageUrl
+                                                                )
+                                                            )
+                                                        }
+                                                    )
+                                                    .padding(all = 12.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Icon(
+                                                    painter = painterResource(Resources.Icon.Delete),
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(14.dp),
+                                                    tint = Resources.appColors.iconPrimary
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }

@@ -9,6 +9,7 @@ import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.storage.File
 import dev.gitlive.firebase.storage.storage
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withTimeout
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -61,9 +62,50 @@ class ProductRepositoryImpl(
                     imagePath.putFile(file)
                     onSuccess(imagePath.getDownloadUrl())
                 }
-            } catch (throwable: Throwable) {
-                onError(throwable.message ?: resourceManager.readString(R.string.lbl_unknown))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                onError(e.message ?: resourceManager.readString(R.string.lbl_unknown))
             }
         }
+    }
+
+    override suspend fun deleteImage(
+        url: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        try {
+            val path = extractStoragePath(url)
+            if (path != null) {
+                productImagesCollection.reference(path).delete()
+                onSuccess()
+            } else {
+                onError("Storage path is null")
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            onError("Error occurred during removing an image: ${e.message}")
+        }
+    }
+
+    private fun extractStoragePath(url: String): String? {
+        val startIndex = url.indexOf("/o/") + 3
+        if (startIndex < 3) return null
+
+        val endIndex = url.indexOf("?", startIndex)
+        val encodedPath = if (endIndex != -1) {
+            url.substring(startIndex, endIndex)
+        } else
+            url.substring(startIndex)
+
+        return decodeThePath(encodedPath)
+    }
+
+    private fun decodeThePath(encodedPath: String): String {
+        return encodedPath
+            .replace("%2F", "/")
+            .replace("%20", " ")
     }
 }
