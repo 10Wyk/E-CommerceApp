@@ -9,7 +9,7 @@ import com.e_commerce.manage_product.model.ManageProductUiState
 import com.e_commerce.shared.di.DiHelper
 import com.e_commerce.shared.domain.model.Product
 import com.e_commerce.shared.domain.model.ProductCategory
-import com.e_commerce.shared.domain.repository.ProductRepository
+import com.e_commerce.shared.domain.repository.AdminRepository
 import com.e_commerce.shared.presentation.utils.ImageState
 import com.e_commerce.shared.presentation.utils.RequestState
 import dev.gitlive.firebase.storage.File
@@ -32,7 +32,7 @@ class ManageProductViewModel(
     val eventFlow = _eventChannel.receiveAsFlow()
 
     private val diComponent = object {
-        val productRepository = DiHelper.get<ProductRepository>()
+        val adminRepository = DiHelper.get<AdminRepository>()
     }
 
     fun actionHandler(action: ManageProductAction) {
@@ -70,7 +70,7 @@ class ManageProductViewModel(
                 )
             }
 
-            diComponent.productRepository.addImage(
+            diComponent.adminRepository.addImage(
                 file = File(image.toUri()),
                 onSuccess = { url ->
                     _state.update { state ->
@@ -99,7 +99,7 @@ class ManageProductViewModel(
                 )
             }
 
-            diComponent.productRepository.deleteImage(
+            diComponent.adminRepository.deleteImage(
                 url = url,
                 onSuccess = {
                     _state.update { state ->
@@ -218,7 +218,7 @@ class ManageProductViewModel(
             )
 
             if (id == null)
-                diComponent.productRepository.createProduct(
+                diComponent.adminRepository.createProduct(
                     product = product,
                     onSuccess = {
                         _state.update { state ->

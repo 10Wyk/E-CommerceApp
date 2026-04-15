@@ -2,7 +2,7 @@ package com.e_commerce.shared.data.repository
 
 import com.e_commerce.shared.R
 import com.e_commerce.shared.domain.model.Product
-import com.e_commerce.shared.domain.repository.ProductRepository
+import com.e_commerce.shared.domain.repository.AdminRepository
 import com.e_commerce.shared.domain.resourceManager.ResourceManager
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
@@ -10,19 +10,22 @@ import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.storage.File
 import dev.gitlive.firebase.storage.storage
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withTimeout
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-class ProductRepositoryImpl(
+class AdminRepositoryImpl(
     private val resourceManager: ResourceManager
-) : ProductRepository {
+) : AdminRepository {
     private companion object {
         const val PRODUCT_COLLECTION = "product"
     }
 
     //@formatter:off
-    private val customerCollection = Firebase.firestore.collection(collectionPath = PRODUCT_COLLECTION)
+    private val productCollection = Firebase.firestore.collection(collectionPath = PRODUCT_COLLECTION)
     private val productImagesCollection = Firebase.storage
     //@formatter:on
 
@@ -36,7 +39,7 @@ class ProductRepositoryImpl(
         try {
             val userId = currentUserId()
             if (userId != null) {
-                customerCollection.document(product.id)
+                productCollection.document(product.id)
                     .set(product)
                 onSuccess()
             } else onError(resourceManager.readString(R.string.msg_user_not_available))
@@ -88,6 +91,35 @@ class ProductRepositoryImpl(
         } catch (e: Exception) {
             onError("Error occurred during removing an image: ${e.message}")
         }
+    }
+
+    override fun readLastProducts(limit: Int): Flow<List<Product>> = channelFlow {
+        val userId = currentUserId()
+        if (userId == null) throw Exception(resourceManager.readString(R.string.msg_user_not_available))
+
+        productCollection
+            .limit(limit = limit)
+            .snapshots
+            .collectLatest { querySnapshot ->
+                val products = querySnapshot.documents.map { documentSnapshot ->
+                    Product(
+                        id = documentSnapshot.id,
+                        title = documentSnapshot.get(field = "title"),
+                        createdAt = documentSnapshot.get(field = "createdAt"),
+                        description = documentSnapshot.get(field = "description"),
+                        thumbnail = documentSnapshot.get(field = "thumbnail"),
+                        category = documentSnapshot.get(field = "category"),
+                        flavors = documentSnapshot.get(field = "flavors"),
+                        weight = documentSnapshot.get(field = "weight"),
+                        price = documentSnapshot.get(field = "price"),
+                        isPopular = documentSnapshot.get(field = "isPopular"),
+                        isDiscounted = documentSnapshot.get(field = "isDiscounted"),
+                        isNew = documentSnapshot.get(field = "isNew"),
+                    )
+                }
+
+                send(products)
+            }
     }
 
     private fun extractStoragePath(url: String): String? {

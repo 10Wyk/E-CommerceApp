@@ -8,9 +8,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -60,6 +61,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import coil3.compose.SubcomposeAsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.e_commerce.manage_product.model.ManageProductAction
 import com.e_commerce.manage_product.model.ManageProductEvent
 import com.e_commerce.manage_product.model.ManageProductUiState
@@ -176,7 +179,6 @@ private fun ManageProductView(
             )
         }
     ) { contentPadding ->
-
         ContentWithMessageBar(
             modifier = Modifier
                 .padding(contentPadding)
@@ -223,62 +225,54 @@ private fun ManageProductView(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             AnimatedContent(
-                                targetState = state.imageState
+                                targetState = state.imageState,
+                                transitionSpec = {
+                                    fadeIn().togetherWith(fadeOut())
+                                }
                             ) { state ->
                                 when (state) {
-                                    ImageState.Idle, ImageState.Error -> {
+                                    ImageState.Idle, ImageState.Error, ImageState.Loading -> {
                                         Button(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .height(300.dp),
                                             colors = ButtonDefaults.buttonColors(
                                                 containerColor = Resources.appColors.surfaceLighter,
-                                                contentColor = Resources.appColors.textPrimary
+                                                contentColor = Resources.appColors.textPrimary,
+                                                disabledContainerColor = Resources.appColors.surfaceLighter
                                             ),
                                             shape = RoundedCornerShape(12.dp),
                                             border = BorderStroke(
                                                 width = 1.dp,
                                                 color = Resources.appColors.surfaceDarker,
                                             ),
+                                            enabled = state != ImageState.Loading,
                                             onClick = {
                                                 imagePicker.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
                                             }
                                         ) {
-                                            Icon(
+                                            if (state == ImageState.Loading)
+                                                CircularProgressIndicator(
+                                                    color = Resources.appColors.iconSecondary
+                                                )
+                                            else Icon(
                                                 painter = painterResource(Resources.Icon.Plus),
                                                 contentDescription = null,
                                                 modifier = Modifier.size(24.dp),
                                                 tint = Resources.appColors.iconPrimary
                                             )
-                                        }
-                                    }
 
-                                    ImageState.Loading -> {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(300.dp)
-                                                .clip(shape = RoundedCornerShape(12.dp))
-                                                .background(color = Resources.appColors.surfaceLighter)
-                                                .border(
-                                                    border = BorderStroke(
-                                                        width = 1.dp,
-                                                        color = Resources.appColors.surfaceDarker
-                                                    ),
-                                                    shape = RoundedCornerShape(12.dp)
-                                                ),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            CircularProgressIndicator(
-                                                color = Resources.appColors.iconSecondary
-                                            )
+
                                         }
                                     }
 
                                     is ImageState.Success -> {
                                         Box {
                                             SubcomposeAsyncImage(
-                                                model = state.imageUrl,
+                                                model = ImageRequest.Builder(LocalContext.current)
+                                                    .data(state.imageUrl)
+                                                    .crossfade(true)
+                                                    .build(),
                                                 contentDescription = null,
                                                 modifier = Modifier
                                                     .fillMaxWidth()
@@ -296,6 +290,18 @@ private fun ManageProductView(
                                                         interactionSource = null,
                                                         indication = ripple(bounded = true)
                                                     ),
+                                                loading = {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxSize()
+                                                            .background(color = Resources.appColors.surfaceLighter),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        CircularProgressIndicator(
+                                                            color = Resources.appColors.iconSecondary
+                                                        )
+                                                    }
+                                                },
                                                 contentScale = ContentScale.Crop,
                                             )
 

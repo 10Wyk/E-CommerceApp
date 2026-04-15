@@ -1,5 +1,7 @@
 package com.wyk.admin
 
+import ContentWithMessageBar
+import MessageBarState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,11 +29,14 @@ import androidx.navigation.compose.composable
 import com.e_commerce.shared.presentation.BebasNeueRegularFont
 import com.e_commerce.shared.presentation.FontSize
 import com.e_commerce.shared.presentation.Resources
+import com.e_commerce.shared.presentation.component.product.ProductCard
 import com.e_commerce.shared.presentation.navigation.Screen
+import com.e_commerce.shared.presentation.utils.DisplayResult
 import com.e_commerce.shared.utils.collectAsOneTimeEvent
 import com.wyk.admin.model.AdminAction
 import com.wyk.admin.model.AdminEvent
 import com.wyk.admin.model.AdminUiState
+import rememberMessageBarState
 
 fun NavGraphBuilder.admin(
     navigateBack: () -> Unit,
@@ -40,9 +45,11 @@ fun NavGraphBuilder.admin(
     composable<Screen.Admin> {
         val viewModel: AdminViewModel = viewModel()
         val state = viewModel.state.collectAsStateWithLifecycle().value
+        val messageBarState = rememberMessageBarState()
 
         Admin(
             state = state,
+            messageBarState = messageBarState,
             action = viewModel::actionHandler
         )
 
@@ -50,6 +57,13 @@ fun NavGraphBuilder.admin(
             when (event) {
                 AdminEvent.NavigateBack -> navigateBack()
                 is AdminEvent.NavigateToManageProduct -> navigateToManageProduct(event.id)
+                is AdminEvent.UpdateErrorMessage -> {
+                    messageBarState.addError(event.message)
+                }
+
+                is AdminEvent.UpdateSuccessMessage -> {
+                    messageBarState.addSuccess(event.message)
+                }
             }
         }
     }
@@ -59,6 +73,7 @@ fun NavGraphBuilder.admin(
 @Composable
 private fun Admin(
     state: AdminUiState,
+    messageBarState: MessageBarState,
     action: (AdminAction) -> Unit
 ) {
     Scaffold(
@@ -122,19 +137,46 @@ private fun Admin(
             }
         }
     ) { contentPadding ->
-        Box(
+        ContentWithMessageBar(
             modifier = Modifier
                 .padding(contentPadding)
-                .fillMaxSize()
-                .background(color = Resources.appColors.surface)
+                .fillMaxSize(),
+            messageBarState = messageBarState,
+            errorMaxLines = 2,
+            errorContainerColor = Resources.appColors.surfaceError,
+            errorContentColor = Resources.appColors.textWhite,
+            successContainerColor = Resources.appColors.surfaceBrand,
+            successContentColor = Resources.appColors.textPrimary
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(state.product) {
+            state.requestState.DisplayResult(
+                onSuccess = { products ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Resources.appColors.surface)
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 8.dp)
+                                .padding(top = 8.dp)
+                        ) {
+                            items(
+                                items = products,
+                                key = { product ->
+                                    product.id
+                                }
+                            ) { product ->
+                                ProductCard(
+                                    product = product
+                                ) {
 
+                                }
+                            }
+                        }
+                    }
                 }
-            }
+            )
         }
     }
 }
