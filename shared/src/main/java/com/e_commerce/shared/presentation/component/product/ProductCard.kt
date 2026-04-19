@@ -40,6 +40,7 @@ import com.e_commerce.shared.domain.model.ProductCategory
 import com.e_commerce.shared.presentation.FontSize
 import com.e_commerce.shared.presentation.PreviewTheme
 import com.e_commerce.shared.presentation.Resources
+import kotlin.time.Clock
 
 @Composable
 fun ProductCard(
@@ -161,7 +162,8 @@ private fun ProductCardPrev() {
                 thumbnail = "https://lh3.googleusercontent.com/a/ACg8ocLXYNBviRwAueE54FKIN79lD2WFld2zPaUZ75Q3gPy5-g9R2R8=s96-c",
                 category = ProductCategory.Creatine.title,
                 weight = 2020,
-                price = 5000.0
+                price = 5000.0,
+                createdAt = Clock.System.now().toEpochMilliseconds()
             ),
             onClick = {}
         )

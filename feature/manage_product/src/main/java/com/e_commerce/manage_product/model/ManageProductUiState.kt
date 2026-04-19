@@ -16,5 +16,6 @@ data class ManageProductUiState(
     val new: Boolean = false,
     val popular: Boolean = false,
     val discounted: Boolean = false,
-    val requestState: RequestState<Product?> = RequestState.Success(null)
+    val requestState: RequestState<Product?> = RequestState.Success(null),
+    val productCreatedAt: Long = 0L
 )

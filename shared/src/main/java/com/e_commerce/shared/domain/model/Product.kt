@@ -7,14 +7,13 @@ import com.e_commerce.shared.presentation.CategoryPurple
 import com.e_commerce.shared.presentation.CategoryRed
 import com.e_commerce.shared.presentation.CategoryYellow
 import kotlinx.serialization.Serializable
-import kotlin.time.Clock
 
 @Serializable
 data class Product(
     val id: String,
     val title: String,
     val description: String,
-    val createdAt: Long = Clock.System.now().toEpochMilliseconds(),
+    val createdAt: Long,
     val thumbnail: String,
     val category: String,
     val flavors: List<String>? = null,

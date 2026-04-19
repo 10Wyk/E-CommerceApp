@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import java.util.UUID
+import kotlin.time.Clock
 
 class ManageProductViewModel(
     private val id: String?
@@ -208,13 +209,16 @@ class ManageProductViewModel(
                 )
             }
 
-            val imageUrl: String? =
-                if (state.imageState is ImageState.Success) state.imageState.imageUrl else null
+            //@formatter:off
+            val imageUrl: String? = if (state.imageState is ImageState.Success) state.imageState.imageUrl else null
+            val createdAt = if(id != null) state.productCreatedAt else Clock.System.now().toEpochMilliseconds()
+            //@formatter:on
 
             val product = Product(
                 id = id ?: UUID.randomUUID().toString(),
                 title = state.title,
                 description = state.description,
+                createdAt = createdAt,
                 flavors = state.flavors?.split(',')?.map { it.trim() },
                 thumbnail = imageUrl.orEmpty(),
                 category = state.productCategory.title,
@@ -300,7 +304,8 @@ class ManageProductViewModel(
                     popular = product?.isPopular ?: false,
                     new = product?.isNew ?: false,
                     discounted = product?.isDiscounted ?: false,
-                    imageState = imageState
+                    imageState = imageState,
+                    productCreatedAt = product?.createdAt ?: 0L
                 )
             }
         }
