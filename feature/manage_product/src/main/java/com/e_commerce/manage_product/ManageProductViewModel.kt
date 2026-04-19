@@ -99,7 +99,7 @@ class ManageProductViewModel(
         viewModelScope.launch {
             _state.update { state ->
                 state.copy(
-                    imageState = ImageState.Loading
+                    requestState = RequestState.Loading
                 )
             }
 
@@ -111,6 +111,8 @@ class ManageProductViewModel(
                             imageState = ImageState.Idle
                         )
                     }
+
+                    if (id != null) upsertProduct()
                 },
                 onError = { message ->
                     _eventChannel.trySend(ManageProductEvent.UpdateErrorMessage(message))

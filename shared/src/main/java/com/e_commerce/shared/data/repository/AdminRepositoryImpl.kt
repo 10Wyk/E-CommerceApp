@@ -178,10 +178,17 @@ class AdminRepositoryImpl(
         try {
             val userId = currentUserId()
             if (userId != null) {
-                productCollection
+                val productDocument = productCollection
                     .document(product.id)
-                    .update(product)
-                onSuccess()
+                    .get()
+                if (!productDocument.exists)
+                    onError("Product does not found")
+                else {
+                    productCollection
+                        .document(product.id)
+                        .update(product)
+                    onSuccess()
+                }
             } else onError(resourceManager.readString(R.string.msg_user_not_available))
         } catch (e: Exception) {
             onError(e.message.orEmpty())
