@@ -3,6 +3,7 @@ package com.wyk.admin
 import ContentWithMessageBar
 import MessageBarState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -159,7 +160,8 @@ private fun Admin(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(horizontal = 8.dp)
-                                .padding(top = 8.dp)
+                                .padding(top = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(
                                 items = products,
@@ -170,7 +172,7 @@ private fun Admin(
                                 ProductCard(
                                     product = product
                                 ) {
-
+                                    action(AdminAction.OnNavigateToManageProductClick(it))
                                 }
                             }
                         }

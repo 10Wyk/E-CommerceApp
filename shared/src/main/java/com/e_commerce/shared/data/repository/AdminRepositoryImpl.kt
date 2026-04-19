@@ -4,7 +4,9 @@ import com.e_commerce.shared.R
 import com.e_commerce.shared.domain.model.Product
 import com.e_commerce.shared.domain.repository.AdminRepository
 import com.e_commerce.shared.domain.resourceManager.ResourceManager
+import com.e_commerce.shared.presentation.utils.RequestState
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseException
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.storage.File
@@ -14,6 +16,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withTimeout
+import okio.IOException
+import java.net.ConnectException
+import java.net.UnknownHostException
+import java.nio.channels.UnresolvedAddressException
+import javax.net.ssl.SSLHandshakeException
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -120,6 +127,65 @@ class AdminRepositoryImpl(
 
                 send(products)
             }
+    }
+
+    override suspend fun readProductById(id: String): RequestState<Product> {
+        try {
+            val userId = currentUserId()
+            if (userId == null) return RequestState.Error(resourceManager.readString(R.string.msg_user_not_available))
+            else {
+                val productDocument = productCollection
+                    .document(id)
+                    .get()
+
+                if (!productDocument.exists) return RequestState.Error("Product does not found")
+
+                val product = Product(
+                    id = productDocument.id,
+                    title = productDocument.get(field = "title"),
+                    createdAt = productDocument.get(field = "createdAt"),
+                    description = productDocument.get(field = "description"),
+                    thumbnail = productDocument.get(field = "thumbnail"),
+                    category = productDocument.get(field = "category"),
+                    flavors = productDocument.get(field = "flavors"),
+                    weight = productDocument.get(field = "weight"),
+                    price = productDocument.get(field = "price"),
+                    isPopular = productDocument.get(field = "isPopular"),
+                    isDiscounted = productDocument.get(field = "isDiscounted"),
+                    isNew = productDocument.get(field = "isNew"),
+                )
+                return RequestState.Success(product)
+            }
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            val message = when (exception) {
+                is UnresolvedAddressException, is UnknownHostException,
+                is ConnectException, is SSLHandshakeException, is FirebaseException,
+                is IOException -> resourceManager.readString(R.string.msg_internet_not_available)
+
+                else -> "Error while reading a Customer information: ${exception.message}"
+            }
+            return RequestState.Error(message)
+        }
+    }
+
+    override suspend fun updateProduct(
+        product: Product,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        try {
+            val userId = currentUserId()
+            if (userId != null) {
+                productCollection
+                    .document(product.id)
+                    .update(product)
+                onSuccess()
+            } else onError(resourceManager.readString(R.string.msg_user_not_available))
+        } catch (e: Exception) {
+            onError(e.message.orEmpty())
+        }
     }
 
     private fun extractStoragePath(url: String): String? {

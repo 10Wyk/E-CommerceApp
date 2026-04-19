@@ -35,6 +35,10 @@ class ManageProductViewModel(
         val adminRepository = DiHelper.get<AdminRepository>()
     }
 
+    init {
+        loadProduct()
+    }
+
     fun actionHandler(action: ManageProductAction) {
         when (action) {
             is ManageProductAction.OnChangeDescription -> onChangeDescription(action.description)
@@ -223,7 +227,7 @@ class ManageProductViewModel(
                     onSuccess = {
                         _state.update { state ->
                             state.copy(
-                                requestState = RequestState.Success(Unit)
+                                requestState = RequestState.Success(product)
                             )
                         }
                         _eventChannel.trySend(ManageProductEvent.UpdateSuccessMessage("Product added"))
@@ -237,7 +241,64 @@ class ManageProductViewModel(
                         _eventChannel.trySend(ManageProductEvent.UpdateSuccessMessage(it))
                     }
                 )
+            else diComponent.adminRepository.updateProduct(
+                product = product,
+                onSuccess = {
+                    _state.update { state ->
+                        state.copy(
+                            requestState = RequestState.Success(product)
+                        )
+                    }
+                    _eventChannel.trySend(ManageProductEvent.UpdateSuccessMessage("Product updated"))
+                },
+                onError = {
+                    _state.update { state ->
+                        state.copy(
+                            requestState = RequestState.Error(it)
+                        )
+                    }
+                    _eventChannel.trySend(ManageProductEvent.UpdateSuccessMessage(it))
+                }
+            )
 
+        }
+    }
+
+    private fun loadProduct() {
+        if (id == null) return
+
+        _state.updateAndGet { state ->
+            state.copy(
+                requestState = RequestState.Loading
+            )
+        }
+
+        viewModelScope.launch {
+            val productRequest = diComponent.adminRepository.readProductById(id)
+
+            val product = if (productRequest.isSuccess()) productRequest.getSuccessData() else null
+
+            val imageState = product?.let {
+                if (product.thumbnail.isNotBlank()) ImageState.Success(product.thumbnail)
+                else ImageState.Idle
+            } ?: ImageState.Idle
+
+            _state.updateAndGet { state ->
+                state.copy(
+                    requestState = diComponent.adminRepository.readProductById(id),
+                    title = product?.title.orEmpty(),
+                    description = product?.description.orEmpty(),
+                    productCategory = product?.let { ProductCategory.getByTitle(it.category) }
+                        ?: ProductCategory.Protein,
+                    weight = product?.weight?.toString(),
+                    flavors = product?.flavors?.joinToString(","),
+                    price = product?.price?.toString().orEmpty(),
+                    popular = product?.isPopular ?: false,
+                    new = product?.isNew ?: false,
+                    discounted = product?.isDiscounted ?: false,
+                    imageState = imageState
+                )
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.e_commerce.manage_product.model
 
+import com.e_commerce.shared.domain.model.Product
 import com.e_commerce.shared.domain.model.ProductCategory
 import com.e_commerce.shared.presentation.utils.ImageState
 import com.e_commerce.shared.presentation.utils.RequestState
@@ -15,5 +16,5 @@ data class ManageProductUiState(
     val new: Boolean = false,
     val popular: Boolean = false,
     val discounted: Boolean = false,
-    val requestState: RequestState<Unit> = RequestState.Success(Unit)
+    val requestState: RequestState<Product?> = RequestState.Success(null)
 )

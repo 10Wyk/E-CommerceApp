@@ -1,6 +1,7 @@
 package com.e_commerce.shared.domain.repository
 
 import com.e_commerce.shared.domain.model.Product
+import com.e_commerce.shared.presentation.utils.RequestState
 import dev.gitlive.firebase.storage.File
 import kotlinx.coroutines.flow.Flow
 
@@ -25,4 +26,10 @@ interface AdminRepository {
     )
 
     fun readLastProducts(limit: Int = 10): Flow<List<Product>>
+    suspend fun readProductById(id: String): RequestState<Product>
+    suspend fun updateProduct(
+        product: Product,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    )
 }
