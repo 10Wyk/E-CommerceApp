@@ -32,4 +32,10 @@ interface AdminRepository {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     )
+    suspend fun updateThumbnail(
+        id: String,
+        url: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    )
 }

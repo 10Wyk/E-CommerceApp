@@ -82,6 +82,8 @@ class ManageProductViewModel(
                             imageState = ImageState.Success(url)
                         )
                     }
+
+                    if (id != null) updateProductImage(id = id, url = url)
                 },
                 onError = { message ->
                     _eventChannel.trySend(ManageProductEvent.UpdateErrorMessage(message))
@@ -99,7 +101,7 @@ class ManageProductViewModel(
         viewModelScope.launch {
             _state.update { state ->
                 state.copy(
-                    requestState = RequestState.Loading
+                    imageState = ImageState.Loading
                 )
             }
 
@@ -112,7 +114,7 @@ class ManageProductViewModel(
                         )
                     }
 
-                    if (id != null) upsertProduct()
+                    if (id != null) updateProductImage(id = id, url = "")
                 },
                 onError = { message ->
                     _eventChannel.trySend(ManageProductEvent.UpdateErrorMessage(message))
@@ -301,6 +303,34 @@ class ManageProductViewModel(
                     imageState = imageState
                 )
             }
+        }
+    }
+
+    private fun updateProductImage(
+        id: String,
+        url: String
+    ) {
+        viewModelScope.launch {
+            diComponent.adminRepository.updateThumbnail(
+                id = id,
+                url = url,
+                onSuccess = {
+                    _state.update { state ->
+                        state.copy(
+                            requestState = RequestState.Success(null)
+                        )
+                    }
+                    _eventChannel.trySend(ManageProductEvent.UpdateSuccessMessage("Product image updated"))
+                },
+                onError = {
+                    _state.update { state ->
+                        state.copy(
+                            requestState = RequestState.Error(it)
+                        )
+                    }
+                    _eventChannel.trySend(ManageProductEvent.UpdateSuccessMessage(it))
+                }
+            )
         }
     }
 }
