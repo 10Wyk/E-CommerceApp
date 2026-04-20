@@ -92,7 +92,7 @@ fun ProductCard(
                 .padding(all = 12.dp)
         ) {
             Text(
-                text = product.title,
+                text = product.title.uppercase(),
                 fontSize = FontSize.MEDIUM,
                 color = Resources.appColors.textPrimary,
                 maxLines = 1,

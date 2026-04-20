@@ -2,24 +2,35 @@ package com.wyk.admin
 
 import ContentWithMessageBar
 import MessageBarState
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -77,50 +88,100 @@ private fun Admin(
     messageBarState: MessageBarState,
     action: (AdminAction) -> Unit
 ) {
+    var searchEnabled by remember { mutableStateOf(false) }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .background(color = Resources.appColors.surface)
             .systemBarsPadding(),
         topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Resources.appColors.surface,
-                    navigationIconContentColor = Resources.appColors.iconPrimary,
-                    titleContentColor = Resources.appColors.textPrimary
-                ),
-                title = {
-                    Text(
-                        text = "admin panel".uppercase(),
-                        fontFamily = BebasNeueRegularFont(),
-                        fontSize = FontSize.LARGE
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            action(AdminAction.OnNavigateBackClick)
+            AnimatedContent(
+                targetState = searchEnabled
+            ) { searchState ->
+                if (searchState) {
+                    SearchBar(
+                        colors = SearchBarDefaults.colors(
+                            containerColor = Resources.appColors.surface,
+                            inputFieldColors = TextFieldDefaults.colors(
+                                focusedContainerColor = Resources.appColors.surfaceLighter,
+                                disabledContainerColor = Resources.appColors.surfaceLighter,
+                                errorContainerColor = Resources.appColors.surfaceLighter,
+                                unfocusedContainerColor = Resources.appColors.surfaceLighter
+                            )
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        inputField = {
+                            SearchBarDefaults.InputField(
+                                query = state.query,
+                                onQueryChange = { query ->
+                                    action(AdminAction.OnQueryChange(query = query))
+                                },
+                                onSearch = {},
+                                expanded = false,
+                                onExpandedChange = { },
+                                placeholder = { Text("Search") },
+                                trailingIcon = {
+                                    IconButton(
+                                        onClick = {
+                                            if (state.query.isEmpty())
+                                                searchEnabled = false
+                                            else action(AdminAction.OnQueryChange(query = ""))
+                                        },
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(Resources.Icon.Close),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                }
+                            )
                         },
-                    ) {
-                        Icon(
-                            painter = painterResource(Resources.Icon.BackArrow),
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp)
+                        expanded = false,
+                        onExpandedChange = {}
+                    ) { }
+                } else TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Resources.appColors.surface,
+                        navigationIconContentColor = Resources.appColors.iconPrimary,
+                        titleContentColor = Resources.appColors.textPrimary
+                    ),
+                    title = {
+                        Text(
+                            text = "admin panel".uppercase(),
+                            fontFamily = BebasNeueRegularFont(),
+                            fontSize = FontSize.LARGE
                         )
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                action(AdminAction.OnNavigateBackClick)
+                            },
+                        ) {
+                            Icon(
+                                painter = painterResource(Resources.Icon.BackArrow),
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                searchEnabled = true
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(Resources.Icon.Search),
+                                modifier = Modifier.size(24.dp),
+                                contentDescription = null
+                            )
+                        }
                     }
-                },
-                actions = {
-                    IconButton(
-                        onClick = {}
-                    ) {
-                        Icon(
-                            painter = painterResource(Resources.Icon.Search),
-                            modifier = Modifier.size(24.dp),
-                            contentDescription = null
-                        )
-                    }
-                }
-            )
+                )
+            }
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -150,32 +211,39 @@ private fun Admin(
             successContentColor = Resources.appColors.textPrimary
         ) {
             state.requestState.DisplayResult(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Resources.appColors.surface),
                 onSuccess = { products ->
-                    Box(
+                    LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(color = Resources.appColors.surface)
+                            .padding(horizontal = 8.dp)
+                            .padding(top = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 8.dp)
-                                .padding(top = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(
-                                items = products,
-                                key = { product ->
-                                    product.id
-                                }
-                            ) { product ->
-                                ProductCard(
-                                    product = product
-                                ) {
-                                    action(AdminAction.OnNavigateToManageProductClick(it))
-                                }
+                        items(
+                            items = products,
+                            key = { product ->
+                                product.id
+                            }
+                        ) { product ->
+                            ProductCard(
+                                product = product
+                            ) {
+                                action(AdminAction.OnNavigateToManageProductClick(it))
                             }
                         }
+                    }
+                },
+                onLoading = {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = Resources.appColors.iconSecondary
+                        )
                     }
                 }
             )

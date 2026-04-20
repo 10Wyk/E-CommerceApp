@@ -1,5 +1,6 @@
 package com.e_commerce.shared.data.repository
 
+import android.util.Log
 import com.e_commerce.shared.R
 import com.e_commerce.shared.domain.model.Product
 import com.e_commerce.shared.domain.repository.AdminRepository
@@ -47,7 +48,7 @@ class AdminRepositoryImpl(
             val userId = currentUserId()
             if (userId != null) {
                 productCollection.document(product.id)
-                    .set(product)
+                    .set(product.copy(title = product.title.lowercase()))
                 onSuccess()
             } else onError(resourceManager.readString(R.string.msg_user_not_available))
         } catch (e: Exception) {
@@ -186,7 +187,7 @@ class AdminRepositoryImpl(
                 else {
                     productCollection
                         .document(product.id)
-                        .update(product)
+                        .set(product.copy(title = product.title.lowercase()))
                     onSuccess()
                 }
             } else onError(resourceManager.readString(R.string.msg_user_not_available))
@@ -220,6 +221,53 @@ class AdminRepositoryImpl(
             } else onError(resourceManager.readString(R.string.msg_user_not_available))
         } catch (e: Exception) {
             onError(e.message.orEmpty())
+        }
+    }
+
+    override fun searchProduct(query: String): Flow<List<Product>> = channelFlow {
+        try {
+            val userId = currentUserId()
+            if (userId == null) throw Exception(resourceManager.readString(R.string.msg_user_not_available))
+            else {
+                val queryText = query.lowercase().trim()
+                val endText = queryText + "\uf8ff"
+
+                productCollection
+                    .orderBy("title")
+                    .startAtFieldValues { add(queryText) }
+                    .endAtFieldValues { add(endText) }
+                    .snapshots
+                    .collectLatest { snapshot ->
+                        val products = snapshot.documents.map { documentSnapshot ->
+                            Product(
+                                id = documentSnapshot.id,
+                                title = documentSnapshot.get(field = "title"),
+                                createdAt = documentSnapshot.get(field = "createdAt"),
+                                description = documentSnapshot.get(field = "description"),
+                                thumbnail = documentSnapshot.get(field = "thumbnail"),
+                                category = documentSnapshot.get(field = "category"),
+                                flavors = documentSnapshot.get(field = "flavors"),
+                                weight = documentSnapshot.get(field = "weight"),
+                                price = documentSnapshot.get(field = "price"),
+                                isPopular = documentSnapshot.get(field = "isPopular"),
+                                isDiscounted = documentSnapshot.get(field = "isDiscounted"),
+                                isNew = documentSnapshot.get(field = "isNew"),
+                            )
+                        }
+
+                        send(products)
+                    }
+            }
+        } catch (e: FirebaseException) {
+            Log.e("Admin Repository", "Error while reading product", e)
+        } catch (exception: Exception) {
+            throw when (exception) {
+                is UnresolvedAddressException, is UnknownHostException,
+                is ConnectException, is SSLHandshakeException,
+                is IOException -> Exception(resourceManager.readString(R.string.msg_internet_not_available))
+
+                else -> Exception("Error while reading a Product information: ${exception.message}")
+            }
         }
     }
 

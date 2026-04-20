@@ -9,10 +9,15 @@ import com.e_commerce.shared.presentation.utils.RequestState
 import com.wyk.admin.model.AdminAction
 import com.wyk.admin.model.AdminEvent
 import com.wyk.admin.model.AdminUiState
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,6 +33,7 @@ class AdminViewModel : ViewModel() {
         val adminRepository = DiHelper.get<AdminRepository>()
         val resourceManager = DiHelper.get<ResourceManager>()
     }
+    private var searchJob: Job? = null
 
     init {
         fetchData()
@@ -37,6 +43,44 @@ class AdminViewModel : ViewModel() {
         when (action) {
             AdminAction.OnNavigateBackClick -> navigateBackClick()
             is AdminAction.OnNavigateToManageProductClick -> onNavigateToManageProductClick(action.id)
+            is AdminAction.OnQueryChange -> queryChange(action.query)
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun queryChange(query: String) {
+        searchJob?.cancel()
+        _state.update { state ->
+            state.copy(
+                query = query
+            )
+        }
+
+        searchJob = viewModelScope.launch {
+            diComponent.adminRepository.searchProduct(query)
+                .debounce(300)
+                .onStart {
+                    _state.update { state ->
+                        state.copy(
+                            requestState = RequestState.Loading,
+                        )
+                    }
+                }
+                .catch { throwable ->
+                    if (throwable !is CancellationException)
+                        _state.update { state ->
+                            state.copy(
+                                requestState = RequestState.Error(message = "Error while loading products: ${throwable.message}")
+                            )
+                        }
+                }
+                .collect { products ->
+                    _state.update { state ->
+                        state.copy(
+                            requestState = RequestState.Success(products)
+                        )
+                    }
+                }
         }
     }
 
@@ -49,14 +93,15 @@ class AdminViewModel : ViewModel() {
     }
 
     private fun fetchData() {
-        _state.update { state ->
-            state.copy(
-                requestState = RequestState.Loading
-            )
-        }
-
         viewModelScope.launch {
             diComponent.adminRepository.readLastProducts()
+                .onStart {
+                    _state.update { state ->
+                        state.copy(
+                            requestState = RequestState.Loading
+                        )
+                    }
+                }
                 .catch { throwable ->
                     _state.update { state ->
                         state.copy(
