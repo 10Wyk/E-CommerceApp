@@ -271,6 +271,31 @@ class AdminRepositoryImpl(
         }
     }
 
+    override suspend fun deleteProduct(
+        uid: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        try {
+            val userId = currentUserId()
+            if (userId != null) {
+                val productDocument = productCollection
+                    .document(uid)
+                    .get()
+                if (!productDocument.exists)
+                    onError("Product does not found")
+                else {
+                    productCollection
+                        .document(uid)
+                        .delete()
+                    onSuccess()
+                }
+            } else onError(resourceManager.readString(R.string.msg_user_not_available))
+        } catch (e: Exception) {
+            onError(e.message.orEmpty())
+        }
+    }
+
     private fun extractStoragePath(url: String): String? {
         val startIndex = url.indexOf("/o/") + 3
         if (startIndex < 3) return null

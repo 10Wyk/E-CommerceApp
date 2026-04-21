@@ -55,6 +55,41 @@ class ManageProductViewModel(
             ManageProductAction.OnNavigateBackClick -> navigateBackClick()
             is ManageProductAction.OnSelectImage -> selectImage(action.image)
             is ManageProductAction.OnDeleteImage -> deleteImage(action.url)
+            ManageProductAction.OnDeleteProduct -> deleteProduct()
+        }
+    }
+
+    private fun deleteProduct() {
+        if (id == null) return
+
+        _state.update { state ->
+            state.copy(
+                requestState = RequestState.Loading
+            )
+        }
+
+        viewModelScope.launch {
+            diComponent.adminRepository.deleteProduct(
+                uid = id,
+                onSuccess = {
+                    _state.update { state ->
+                        state.copy(
+                            requestState = RequestState.Success(null)
+                        )
+                    }
+
+                    _eventChannel.trySend(ManageProductEvent.UpdateSuccessMessage("Product deleted"))
+                    _eventChannel.trySend(ManageProductEvent.NavigateBack)
+                },
+                onError = { message ->
+                    _eventChannel.trySend(ManageProductEvent.UpdateErrorMessage(message))
+                    _state.update { state ->
+                        state.copy(
+                            requestState = RequestState.Error(message)
+                        )
+                    }
+                }
+            )
         }
     }
 

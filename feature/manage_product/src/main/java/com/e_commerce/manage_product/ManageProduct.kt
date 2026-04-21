@@ -31,6 +31,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -125,7 +127,6 @@ private fun ManageProductView(
     val title = if (update) "edit product" else "new product"
 
     var dialogVisibility by remember { mutableStateOf(false) }
-
     if (dialogVisibility) CategoryPickerDialog(
         selectedCategory = state.productCategory,
         onDismiss = {
@@ -135,6 +136,7 @@ private fun ManageProductView(
             action(ManageProductAction.OnSelectProductCategory(it))
         }
     )
+    var menuExpanded by remember { mutableStateOf(false) }
 
     //@formatter:off
     val imagePicker = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -174,6 +176,33 @@ private fun ManageProductView(
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)
                         )
+                    }
+                },
+                actions = {
+                    if (update) Box {
+                        IconButton(
+                            onClick = {
+                                menuExpanded = true
+                            },
+                        ) {
+                            Icon(
+                                painter = painterResource(Resources.Icon.VerticalMenu),
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = menuExpanded,
+                            onDismissRequest = { menuExpanded = false },
+                            containerColor = Resources.appColors.surface
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Delete") },
+                                onClick = {
+                                    action(ManageProductAction.OnDeleteProduct)
+                                }
+                            )
+                        }
                     }
                 }
             )

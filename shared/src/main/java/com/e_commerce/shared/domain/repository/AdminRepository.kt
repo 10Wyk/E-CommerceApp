@@ -32,11 +32,18 @@ interface AdminRepository {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     )
+
     suspend fun updateThumbnail(
         id: String,
         url: String,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     )
+
     fun searchProduct(query: String): Flow<List<Product>>
+    suspend fun deleteProduct(
+        uid: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    )
 }
