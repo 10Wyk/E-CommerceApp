@@ -97,23 +97,24 @@ private fun Admin(
             .systemBarsPadding(),
         topBar = {
             AnimatedContent(
-                targetState = searchEnabled
+                targetState = searchEnabled,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = Resources.appColors.surface)
             ) { searchState ->
                 if (searchState) {
                     SearchBar(
-                        colors = SearchBarDefaults.colors(
-                            containerColor = Resources.appColors.surface,
-                            inputFieldColors = TextFieldDefaults.colors(
-                                focusedContainerColor = Resources.appColors.surfaceLighter,
-                                disabledContainerColor = Resources.appColors.surfaceLighter,
-                                errorContainerColor = Resources.appColors.surfaceLighter,
-                                unfocusedContainerColor = Resources.appColors.surfaceLighter
-                            )
-                        ),
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         inputField = {
                             SearchBarDefaults.InputField(
                                 query = state.query,
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Resources.appColors.surfaceLighter,
+                                    disabledContainerColor = Resources.appColors.surfaceLighter,
+                                    errorContainerColor = Resources.appColors.surfaceLighter,
+                                    unfocusedContainerColor = Resources.appColors.surfaceLighter
+                                ),
                                 onQueryChange = { query ->
                                     action(AdminAction.OnQueryChange(query = query))
                                 },
@@ -139,8 +140,9 @@ private fun Admin(
                             )
                         },
                         expanded = false,
-                        onExpandedChange = {}
-                    ) { }
+                        onExpandedChange = {},
+                        content = {}
+                    )
                 } else TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Resources.appColors.surface,
