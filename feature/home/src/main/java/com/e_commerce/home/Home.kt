@@ -64,6 +64,7 @@ import com.e_commerce.shared.presentation.utils.ScreenSize
 import com.e_commerce.shared.presentation.utils.onSwipeLeft
 import com.e_commerce.shared.utils.collectAsOneTimeEvent
 import com.e_commerce.shared.utils.ifNotBlank
+import com.wyk.productsoverview.ProductsOverview
 import rememberMessageBarState
 
 fun NavGraphBuilder.homeGraph(
@@ -303,7 +304,7 @@ private fun Home(
                         startDestination = Screen.ProductOverview
                     ) {
                         composable<Screen.ProductOverview> {
-                            Text("first")
+                            ProductsOverview()
                         }
 
                         composable<Screen.Cart> {

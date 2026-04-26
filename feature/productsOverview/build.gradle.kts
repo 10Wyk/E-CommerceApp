@@ -6,9 +6,8 @@ plugins {
 }
 
 android {
-    namespace = "com.e_commerce.home"
+    namespace = "com.wyk.productsoverview"
     compileSdk = 36
-
     defaultConfig {
         minSdk = 26
 
@@ -57,6 +56,6 @@ dependencies {
     implementation(libs.auth.kmp)
     implementation(libs.auth.firebase.kmp)
     runtimeOnly(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.bundles.coil)
     implementation(project(":shared"))
-    implementation(project(":feature:productsOverview"))
 }
